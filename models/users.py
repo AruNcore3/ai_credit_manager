@@ -13,7 +13,7 @@ class User(Base):
     email = Column[str](String, unique=True, index=True)
     password_hash = Column[str](String, nullable=False)
 
-    is_active = Column[bool]g(Boolean, default=True)
+    is_active = Column[bool](Boolean, default=True)
     created_at = Column[datetime](DateTime, default=datetime.now)
     updated_at = Column[datetime](DateTime, default=datetime.now)
     wallet = relationship("Wallet", back_populates="user",uselist=False)
