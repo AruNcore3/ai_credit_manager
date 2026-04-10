@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import DateTime, ForeignKey, Integer
+from sqlalchemy import DateTime, ForeignKey, Integer,Boolean
 from sqlalchemy.orm import Session, Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -21,14 +21,20 @@ class Wallet(Base):
 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, nullable=False)
-
+    # auto top up settings
+    auto_top_up_enabled: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    auto_top_up_amount: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    auto_top_up_threshold: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    auto_top_up_daily_limit: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    auto_top_up_monthly: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+   
     user = relationship("User", back_populates="wallet")
 
 
 class InsufficientCreditsError(ValueError):
     pass
 
-
+    
 def get_or_create_wallet(db: Session, *, user_id: int) -> Wallet:
     wallet = db.query(Wallet).filter(Wallet.user_id == user_id).one_or_none()
     if wallet is not None:
@@ -96,3 +102,4 @@ def spend_credits(
     )
     db.flush()
     return wallet
+
