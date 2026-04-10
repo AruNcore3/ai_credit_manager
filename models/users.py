@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import DateTime, ForeignKey, Integer
+from sqlalchemy import DateTime, ForeignKey, Integer,String,Boolean
 from sqlalchemy.orm import Session, Mapped, mapped_column, relationship
 
 from app.database import Base
