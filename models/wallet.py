@@ -23,7 +23,7 @@ class Wallet(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, nullable=False)
     # auto top up settings
     auto_top_up_enabled: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-    auto_top_up_amount: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    auto_top_up_amount: Mapped[int] = mapped_column(Integer, default=5000, nullable=False)
     auto_top_up_threshold: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     auto_top_up_daily_limit: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     auto_top_up_monthly: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
