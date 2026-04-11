@@ -22,3 +22,4 @@ def amount_cents_for_credits(credits: int) -> int:
     if credits <= 0:
         raise ValueError("credits must be > 0")
     return (credits * _DEFAULT_CENTS_PER_PACK) // DEFAULT_TOPUP_CREDITS
+
