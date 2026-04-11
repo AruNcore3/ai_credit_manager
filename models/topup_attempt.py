@@ -6,11 +6,17 @@ from typing import Optional, TYPE_CHECKING
 from sqlalchemy import CheckConstraint, DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.database import Base
+import sys
+import os
 
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+
+from app.database import Base
+from models.users import User
 # ✅ Avoid circular import
 if TYPE_CHECKING:
-    from app.models.user import User
+    from app.models.users import User
 
 
 class TopUpAttempt(Base):
