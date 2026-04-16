@@ -18,12 +18,16 @@ def topup_intent(
         raise HTTPException(status_code=400, detail="credits must be > 0")
 
     key = idempotency_key or str(uuid.uuid4())
-    attempt, pi, amount_cents = create_topup_intent(
-        db,
-        user_id=x_user_id,
-        credits=body.credits,
-        idempotency_key=key,
-    )
+    try:
+        attempt, pi, amount_cents = create_topup_intent(
+            db,
+            user_id=x_user_id,
+            credits=body.credits,
+            idempotency_key=key,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
     return TopUpIntentResponse(
         attempt_id=attempt.id,
         client_secret=pi.client_secret,

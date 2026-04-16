@@ -2,11 +2,11 @@ from sqlalchemy.orm.session import Session
 import os
 from dotenv import load_dotenv
 
-print("current working:dir",os.getcwd())
 load_dotenv()
-print("ENV VALUE:",os.getenv("DATABASE_URL"))
 
 DB_URL = os.getenv("DATABASE_URL")
+if not DB_URL:
+    raise RuntimeError("DATABASE_URL is missing")
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
@@ -17,7 +17,6 @@ SessionLocal = sessionmaker[Session](autocommit=False, autoflush=False, bind=eng
 Base = declarative_base()
 
 from typing import Generator
-# ... keep your existing engine/Base code
 
 def get_db() -> Generator[Session, None, None]:
     db = SessionLocal()

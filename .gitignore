@@ -1,2 +1,4 @@
 .env
 stripe_secrets.fish
+__pycache__/
+.pytest_cache/
