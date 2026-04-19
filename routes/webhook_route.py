@@ -34,7 +34,11 @@ async def stripe_webhook(
     if event_type == "payment_intent.succeeded":
         pi = event["data"]["object"]
         payment_intent_id = pi["id"]
-        metadata = (pi.get("metadata") or {}) if hasattr(pi, "get") else {}
+        try:
+            raw_metadata = pi["metadata"]
+            metadata = dict(raw_metadata) if raw_metadata else {}
+        except Exception:
+            metadata = {}
         logger.info("stripe_webhook_metadata metadata=%s", metadata)
 
         attempt_id = metadata.get("topup_attempt_id")

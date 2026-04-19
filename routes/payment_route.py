@@ -1,7 +1,9 @@
 import uuid
+import stripe
 from fastapi import APIRouter, Depends, Header, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
+from models.users import User
 from schemas.wallet_schema import TopUpIntentRequest, TopUpIntentResponse
 from services.payment_service import create_topup_intent
 
@@ -16,6 +18,9 @@ def topup_intent(
 ):
     if body.credits <= 0:
         raise HTTPException(status_code=400, detail="credits must be > 0")
+    user = db.query(User).filter(User.id == x_user_id).one_or_none()
+    if user is None:
+        raise HTTPException(status_code=404, detail=f"user {x_user_id} not found")
 
     key = idempotency_key or str(uuid.uuid4())
     try:
@@ -26,7 +31,11 @@ def topup_intent(
             idempotency_key=key,
         )
     except ValueError as exc:
+        db.rollback()
         raise HTTPException(status_code=400, detail=str(exc))
+    except stripe.error.StripeError as exc:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=f"stripe error: {str(exc)}")
 
     return TopUpIntentResponse(
         attempt_id=attempt.id,

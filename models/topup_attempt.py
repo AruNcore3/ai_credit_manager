@@ -16,7 +16,7 @@ from app.database import Base
 from models.users import User
 # ✅ Avoid circular import
 if TYPE_CHECKING:
-    from app.models.users import User
+    from models.users import User
 
 
 class TopUpAttempt(Base):

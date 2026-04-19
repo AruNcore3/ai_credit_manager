@@ -41,7 +41,9 @@ def create_topup_intent(
     pi = stripe.PaymentIntent.create(
         amount=amount_cents,
         currency=TOPUP_CURRENCY,
-        automatic_payment_methods={"enabled": True},
+        automatic_payment_methods={"enabled": True, "allow_redirects": "never"},
+        confirm=True,
+        payment_method="pm_card_visa",
         metadata={
             "user_id": str(user_id),
             "topup_attempt_id": str(attempt.id),
