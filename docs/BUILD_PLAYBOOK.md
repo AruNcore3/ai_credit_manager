@@ -3,9 +3,9 @@
 Use this as your execution checklist whenever you resume work.
 
 ## Week 1: Foundation Hardening
-1. Add API key auth middleware/dependency.
-2. Introduce `Account` (tenant) model and map users to account.
-3. Remove `X-User-Id` trust model for external API consumers.
+1. Add API key auth middleware/dependency. [Done]
+2. Introduce `Account` (tenant) model and map users to account. [Done]
+3. Remove `X-User-Id` trust model for external API consumers. [Done]
 4. Add Alembic and create first migration set.
 5. Normalize env/config loading and startup validation.
 
@@ -14,7 +14,7 @@ Exit criteria:
 - Database schema is migration-managed.
 
 ## Week 2: Usage Metering (Most Important)
-1. Create `POST /v1/usage/record`.
+1. Create `POST /v1/usage/record`. [Done]
 2. Request payload should include:
 - `account_id`
 - `event_id` (idempotency key)
@@ -81,11 +81,10 @@ Exit criteria:
 3. Webhook replay does not double-credit.
 4. Balance endpoint reflects latest state.
 5. Ledger endpoint returns complete event history.
-6. Usage record deducts expected credits.
-7. Duplicate usage event does not double-deduct.
-8. Invalid API key denied.
+6. Usage record deducts expected credits. [Done]
+7. Duplicate usage event does not double-deduct. [Done]
+8. Invalid API key denied. [Done]
 
 ## What To Build Next (Single Priority)
-Implement `POST /v1/usage/record` with idempotent debit.  
-This is the highest-leverage feature left for MVP.
-
+Implement Alembic migrations and migration scripts for all current models.  
+This unblocks safe schema evolution and production deployment workflows.

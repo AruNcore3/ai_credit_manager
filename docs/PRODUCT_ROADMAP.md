@@ -47,13 +47,16 @@ Done:
 - Stripe webhook endpoint exists
 - Balance and ledger endpoints exist
 - Wallet and ledger models are implemented
+- Usage metering endpoint is implemented (`POST /v1/usage/record`, completed April 20, 2026)
+- Usage debits are idempotent by `event_id`
+- API key auth is implemented on protected routes (`X-API-Key`)
+- User requests are isolated by authenticated account/user context
 
 Not done / partial:
-- API-key auth + tenant isolation
-- Usage metering endpoint (`/usage/record`)
 - Reconciliation worker for missed webhook events
 - Migration workflow (Alembic)
 - Production-grade docs/SDKs
+- Request-level rate limiting
 
 ## 6) Milestone Plan
 ### Milestone 1 - Stable Private Beta API
@@ -89,6 +92,5 @@ MVP is done only when:
 5. Integration guide lets a new developer go live in under 1 hour.
 
 ## 9) Immediate Next Direction
-Build `POST /v1/usage/record` next.  
-This is the missing core capability that converts your project from "wallet top-up system" to "full AI billing API platform."
-
+Build migration workflow (Alembic) + reconciliation worker for missed webhook events next.  
+These are the main reliability gaps before private beta hardening.

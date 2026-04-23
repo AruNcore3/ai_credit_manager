@@ -13,6 +13,7 @@ os.environ.setdefault("STRIPE_WEBHOOK_SECRET", "whsec_dummy")
 
 from app.database import Base, get_db  # noqa: E402
 from app.main import app  # noqa: E402
+from models.account import Account  # noqa: F401,E402
 from models.ledger import Ledger  # noqa: F401,E402
 from models.topup_attempt import TopUpAttempt  # noqa: F401,E402
 from models.users import User  # noqa: F401,E402
