@@ -3,6 +3,19 @@
 ## Endpoint
 - `POST /v1/usage/record`
 
+## API Endpoint Map
+- `POST /v1/payments/topup-intent`
+- `GET /v1/credits/balance`
+- `GET /v1/credits/ledger`
+- `POST /v1/webhooks/stripe`
+- `POST /v1/usage/record`
+
+Legacy compatibility (deprecated, temporary until `Tue, 24 Jun 2026 00:00:00 GMT`):
+- `POST /payments/topup-intent`
+- `GET /credits/balance`
+- `GET /credits/ledger`
+- `POST /webhooks/stripe`
+
 ## Authentication
 - Header: `X-API-Key: <api_key>`
 - Missing API key: `401` with `{"detail":"missing API key"}`

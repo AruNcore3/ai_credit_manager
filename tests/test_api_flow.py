@@ -54,7 +54,7 @@ def test_topup_intent_success(client, test_db_session: Session, monkeypatch: pyt
     monkeypatch.setattr(payment_service.stripe.PaymentIntent, "create", fake_payment_intent_create)
 
     response = client.post(
-        "/payments/topup-intent",
+        "/v1/payments/topup-intent",
         headers={"X-API-Key": "test-api-key-1", "Idempotency-Key": "idem-key-1"},
         json={"credits": 5000},
     )
@@ -75,7 +75,7 @@ def test_topup_intent_invalid_credits(client, test_db_session: Session):
     _create_user(test_db_session, user_id=1)
 
     response = client.post(
-        "/payments/topup-intent",
+        "/v1/payments/topup-intent",
         headers={"X-API-Key": "test-api-key-1"},
         json={"credits": 0},
     )
@@ -85,14 +85,14 @@ def test_topup_intent_invalid_credits(client, test_db_session: Session):
 
 
 def test_topup_intent_requires_api_key(client):
-    response = client.post("/payments/topup-intent", json={"credits": 5000})
+    response = client.post("/v1/payments/topup-intent", json={"credits": 5000})
     assert response.status_code == 401
     assert response.json()["detail"] == "missing API key"
 
 
 def test_balance_defaults_to_zero(client, test_db_session: Session):
     _create_user(test_db_session, user_id=1)
-    response = client.get("/credits/balance", headers={"X-API-Key": "test-api-key-1"})
+    response = client.get("/v1/credits/balance", headers={"X-API-Key": "test-api-key-1"})
     assert response.status_code == 200
     assert response.json() == {"user_id": 1, "balance": 0}
 
@@ -119,24 +119,24 @@ def test_webhook_succeeded_applies_credit_once(client, test_db_session: Session,
     monkeypatch.setattr(webhook_route.stripe.Webhook, "construct_event", fake_construct_event)
 
     first = client.post(
-        "/webhooks/stripe",
+        "/v1/webhooks/stripe",
         headers={"Stripe-Signature": "test_sig"},
         content=b"{}",
     )
     assert first.status_code == 200
 
     second = client.post(
-        "/webhooks/stripe",
+        "/v1/webhooks/stripe",
         headers={"Stripe-Signature": "test_sig"},
         content=b"{}",
     )
     assert second.status_code == 200
 
-    balance = client.get("/credits/balance", headers={"X-API-Key": "test-api-key-1"})
+    balance = client.get("/v1/credits/balance", headers={"X-API-Key": "test-api-key-1"})
     assert balance.status_code == 200
     assert balance.json()["balance"] == 5000
 
-    ledger = client.get("/credits/ledger", headers={"X-API-Key": "test-api-key-1"})
+    ledger = client.get("/v1/credits/ledger", headers={"X-API-Key": "test-api-key-1"})
     assert ledger.status_code == 200
     assert len(ledger.json()) == 1
 
@@ -148,7 +148,7 @@ def test_webhook_invalid_signature_returns_400(client, monkeypatch: pytest.Monke
     monkeypatch.setattr(webhook_route.stripe.Webhook, "construct_event", fake_construct_event)
 
     response = client.post(
-        "/webhooks/stripe",
+        "/v1/webhooks/stripe",
         headers={"Stripe-Signature": "bad_sig"},
         content=b"{}",
     )
@@ -168,7 +168,7 @@ def test_ledger_endpoint_returns_rows(client, test_db_session: Session):
     )
     test_db_session.commit()
 
-    response = client.get("/credits/ledger", headers={"X-API-Key": "test-api-key-1"})
+    response = client.get("/v1/credits/ledger", headers={"X-API-Key": "test-api-key-1"})
     assert response.status_code == 200
     body = response.json()
     assert len(body) == 1
@@ -256,6 +256,13 @@ def test_usage_record_zero_tokens_no_debit(client, test_db_session: Session):
         .all()
     )
     assert len(spend_rows) == 0
+
+
+def test_legacy_route_returns_deprecation_header(client, test_db_session: Session):
+    _create_user(test_db_session, user_id=1)
+    response = client.get("/credits/balance", headers={"X-API-Key": "test-api-key-1"})
+    assert response.status_code == 200
+    assert response.headers.get("Deprecation") == "true"
 
 
 def test_usage_record_insufficient_credits_returns_topup_required(client, test_db_session: Session):

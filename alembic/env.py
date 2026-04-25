@@ -13,7 +13,7 @@ from models.users import User
 from models.wallet import Wallet
 from models.ledger import Ledger
 from models.topup_attempt import TopUpAttempt
-
+from models.api_key import ApiKey
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config

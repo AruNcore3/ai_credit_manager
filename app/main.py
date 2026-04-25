@@ -2,13 +2,10 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from routes import usage_route
-
 # Load project-root `.env` so Stripe keys work in PowerShell / IDE (not only fish + activate.fish).
 load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
-from fastapi import FastAPI
-from fastapi import Request
+from fastapi import FastAPI, Request
 
 from routes.payment_route import router as payment_router
 from routes.webhook_route import router as webhook_router
@@ -20,10 +17,26 @@ app = FastAPI()
 def home():
     return {"message": "Hello, World!"}
 
+@app.middleware("http")
+async def legacy_deprecation_middleware(request: Request, call_next):
+    response = await call_next(request)
 
+    legacy_prefixes = ("/payments", "/credits", "/webhooks")
+    if request.url.path.startswith(legacy_prefixes):
+        response.headers["Deprecation"] = "true"
+        response.headers["Sunset"] = "Tue, 24 Jun 2026 00:00:00 GMT"
 
+    return response
+
+# Versioned routes
+app.include_router(payment_router, prefix="/v1")
+app.include_router(webhook_router, prefix="/v1")
+app.include_router(credit_router, prefix="/v1")
+app.include_router(usage_router)
+
+# Temporary legacy routes (deprecated by middleware header)
 app.include_router(payment_router)
 app.include_router(webhook_router)
 app.include_router(credit_router)
-app.include_router(usage_router)
+
 

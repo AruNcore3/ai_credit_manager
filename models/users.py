@@ -29,6 +29,7 @@ class User(Base):
     ledger = relationship("Ledger", back_populates="user")
     topup_attempts = relationship("TopUpAttempt", back_populates="user")
     account = relationship("Account", back_populates="users")
+    api_keys = relationship("ApiKey", back_populates="user", cascade="all, delete-orphan")
 
 if __name__ == "__main__":
     pass

@@ -51,6 +51,8 @@ Done:
 - Usage debits are idempotent by `event_id`
 - API key auth is implemented on protected routes (`X-API-Key`)
 - User requests are isolated by authenticated account/user context
+- Public endpoint versioning is implemented under `/v1` for payments, credits, webhooks, and usage
+- Temporary legacy unversioned paths are supported with deprecation headers and sunset date (`Tue, 24 Jun 2026 00:00:00 GMT`)
 
 Not done / partial:
 - Reconciliation worker for missed webhook events
@@ -66,7 +68,7 @@ Not done / partial:
 - Add integration tests and CI
 
 ### Milestone 2 - Developer Productization
-- API versioning (`/v1`)
+- API versioning (`/v1`) [Done]
 - Public API docs + quickstart
 - Webhook retry visibility
 - Better error schema + request IDs
@@ -94,3 +96,16 @@ MVP is done only when:
 ## 9) Immediate Next Direction
 Build migration workflow (Alembic) + reconciliation worker for missed webhook events next.  
 These are the main reliability gaps before private beta hardening.
+
+## 10) Current Endpoint Map
+- `POST /v1/payments/topup-intent`
+- `GET /v1/credits/balance`
+- `GET /v1/credits/ledger`
+- `POST /v1/webhooks/stripe`
+- `POST /v1/usage/record`
+
+Legacy compatibility (deprecated, temporary):
+- `POST /payments/topup-intent`
+- `GET /credits/balance`
+- `GET /credits/ledger`
+- `POST /webhooks/stripe`

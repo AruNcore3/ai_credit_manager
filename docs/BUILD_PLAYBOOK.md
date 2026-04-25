@@ -45,7 +45,7 @@ Exit criteria:
 - Billing events are traceable end-to-end.
 
 ## Week 4: Developer Experience
-1. Version all endpoints under `/v1`.
+1. Version all endpoints under `/v1`. [Done]
 2. Write API docs for:
 - top-up flow
 - usage flow
@@ -55,6 +55,7 @@ Exit criteria:
 
 Exit criteria:
 - A new developer can integrate in < 1 hour.
+- Legacy unversioned endpoints remain temporarily available with deprecation headers until `Tue, 24 Jun 2026 00:00:00 GMT`.
 
 ## Week 5: Production Readiness
 1. Add rate limiting and abuse controls.
