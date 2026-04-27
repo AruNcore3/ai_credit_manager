@@ -304,3 +304,74 @@ def test_usage_record_insufficient_credits_returns_topup_required(client, test_d
         .all()
     )
     assert len(spend_rows) == 0
+
+def test_api_keys_create_and_list(client, test_db_session: Session):
+    _create_user(test_db_session, user_id=1)
+
+    create_res = client.post(
+        "/v1/api-keys",
+        headers={"X-API-Key": "test-api-key-1"},
+        json={"name": "prod-key"},
+    )
+    assert create_res.status_code == 200
+    created = create_res.json()
+    assert created["name"] == "prod-key"
+    assert created["api_key"].startswith("ak_live_")
+    assert created["key_prefix"]
+    assert created["id"]
+
+    list_res = client.get("/v1/api-keys", headers={"X-API-Key": "test-api-key-1"})
+    assert list_res.status_code == 200
+    items = list_res.json()
+    assert any(item["id"] == created["id"] for item in items)
+    assert all("api_key" not in item for item in items)  # raw keys must never be listed
+
+
+def test_api_keys_revoke(client, test_db_session: Session):
+    _create_user(test_db_session, user_id=1)
+
+    create_res = client.post(
+        "/v1/api-keys",
+        headers={"X-API-Key": "test-api-key-1"},
+        json={"name": "revoke-me"},
+    )
+    key_id = create_res.json()["id"]
+
+    revoke_res = client.post(
+        f"/v1/api-keys/{key_id}/revoke",
+        headers={"X-API-Key": "test-api-key-1"},
+    )
+    assert revoke_res.status_code == 200
+    body = revoke_res.json()
+    assert body["id"] == key_id
+    assert body["revoked_at"] is not None
+
+
+def test_api_keys_rotate(client, test_db_session: Session):
+    _create_user(test_db_session, user_id=1)
+
+    create_res = client.post(
+        "/v1/api-keys",
+        headers={"X-API-Key": "test-api-key-1"},
+        json={"name": "rotate-me"},
+    )
+    old_key = create_res.json()["api_key"]
+    old_id = create_res.json()["id"]
+
+    rotate_res = client.post(
+        f"/v1/api-keys/{old_id}/rotate",
+        headers={"X-API-Key": "test-api-key-1"},
+    )
+    assert rotate_res.status_code == 200
+    rotated = rotate_res.json()
+    new_key = rotated["api_key"]
+
+    assert new_key.startswith("ak_live_")
+    assert new_key != old_key
+    assert rotated["id"] != old_id  # rotate creates new row in current service behavior
+
+    old_auth = client.get("/v1/credits/balance", headers={"X-API-Key": old_key})
+    assert old_auth.status_code == 401
+
+    new_auth = client.get("/v1/credits/balance", headers={"X-API-Key": new_key})
+    assert new_auth.status_code == 200
