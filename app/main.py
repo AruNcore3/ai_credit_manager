@@ -11,6 +11,7 @@ from routes.payment_route import router as payment_router
 from routes.webhook_route import router as webhook_router
 from routes.credit_route import router as credit_router
 from routes.usage_route import router as usage_router
+from routes.api_key_route import router as api_key_router
 app = FastAPI()
 
 @app.get("/")
@@ -33,6 +34,7 @@ app.include_router(payment_router, prefix="/v1")
 app.include_router(webhook_router, prefix="/v1")
 app.include_router(credit_router, prefix="/v1")
 app.include_router(usage_router)
+app.include_router(api_key_router,prefix="/v1")
 
 # Temporary legacy routes (deprecated by middleware header)
 app.include_router(payment_router)

@@ -8,10 +8,12 @@ from sqlalchemy.orm import Session
 import routes.webhook_route as webhook_route
 import services.payment_service as payment_service
 from models.account import Account
+from models.api_key import ApiKey
 from models.ledger import Ledger
 from models.topup_attempt import TopUpAttempt
 from models.users import User
 from models.wallet import add_credits
+from utils.api_keys import get_key_prefix, hash_api_key
 
 
 def _create_user(
@@ -20,6 +22,7 @@ def _create_user(
     *,
     api_key: str | None = None,
 ) -> User:
+    raw_api_key = api_key or f"test-api-key-{user_id}"
     account = Account(name=f"account_{user_id}")
     db.add(account)
     db.flush()
@@ -27,13 +30,23 @@ def _create_user(
     user = User(
         id=user_id,
         account_id=account.id,
-        api_key=api_key or f"test-api-key-{user_id}",
+        api_key=raw_api_key,
         username=f"user_{user_id}",
         email=f"user_{user_id}@example.com",
         password_hash="test_hash",
         is_active=True,
     )
     db.add(user)
+    db.flush()
+
+    db.add(
+        ApiKey(
+            user_id=user.id,
+            name=f"default_{user_id}",
+            key_prefix=get_key_prefix(raw_api_key),
+            key_hash=hash_api_key(raw_api_key),
+        )
+    )
     db.commit()
     db.refresh(user)
     return user

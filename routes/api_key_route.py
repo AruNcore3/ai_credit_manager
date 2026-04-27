@@ -1,4 +1,4 @@
-from fastapi import APIRouter,Depends,HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.auth import get_current_user
@@ -9,10 +9,8 @@ from schemas.api_key_schema import (
     ApiKeyCreateResponse,
     ApiKeyItem,
     ApiKeyRevokeResponse,
-    ApiKeyRotateResponse,   
+    ApiKeyRotateResponse,
 )
-
-from services.api_key_service import revoke_api_key
 from services.api_key_service import (
     create_api_key,
     list_api_keys,
@@ -20,18 +18,19 @@ from services.api_key_service import (
     rotate_api_key,
 )
 
-router = APIRouter(prefix="api-keys",tags=["api-keys"])
+router = APIRouter(prefix="/api-keys", tags=["api-keys"])
 
-@router.post("",response_model=ApiKeyCreateResponse)
+
+@router.post("", response_model=ApiKeyCreateResponse)
 def create_key(
-    body:ApiKeyCreateRequest,
-    db:Session = Depends(get_db),
+    body: ApiKeyCreateRequest,
+    db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     try:
-        row = revoke_api_key(db,user_id=current_user.id,name=body.name)
+        row, raw_key = create_api_key(db, user_id=current_user.id, name=body.name)
     except ValueError as exc:
-        raise HTTPException(status_code=400, details=str(exc))
+        raise HTTPException(status_code=400, detail=str(exc))
 
     return ApiKeyCreateResponse(
         id=row.id,
@@ -41,40 +40,43 @@ def create_key(
         created_at=row.created_at,
     )
 
-@router.get("",response_model=list[ApiKeyItem])
+
+@router.get("", response_model=list[ApiKeyItem])
 def list_keys(
-    db:Session = Depends(get_db),
-    current_user:User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
-    rows = list_api_keys(db,user_id=current_user.id)
+    rows = list_api_keys(db, user_id=current_user.id)
     return rows
 
-@router.post(f"/{key_id}/revoke", response_model=ApiKeyRevokeResponse)
+
+@router.post("/{key_id}/revoke", response_model=ApiKeyRevokeResponse)
 def revoke_key(
-    key_id:int,
-    db:Session = Depends(get_db),
-    current_user:User = Depends(get_current_user),
+    key_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     try:
-        row = revoke_api_key(db,user_id=current_user.id,key_id=key_id)
+        row = revoke_api_key(db, user_id=current_user.id, key_id=key_id)
     except ValueError:
-        raise HTTPException(status_code=404,detail="api key not found")
+        raise HTTPException(status_code=404, detail="api key not found")
 
-    return ApiKeyCreateResponse(
+    return ApiKeyRevokeResponse(
         id=row.id,
-        revoked_at = row.revoked_at,
+        revoked_at=row.revoked_at,
     )
 
-@router.post(f"/{key_id}/rotate", response_model=ApiKeyRotateResponse)
+
+@router.post("/{key_id}/rotate", response_model=ApiKeyRotateResponse)
 def rotate_key(
-    key_id:int,
-    db:Session = Depends(get_db),
-    current_user:User = Depends(get_current_user),
+    key_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     try:
-        row,raw_key = rotate_api_key(db,user_id=current_user.id,key_id=key_id)
+        row, raw_key = rotate_api_key(db, user_id=current_user.id, key_id=key_id)
     except ValueError:
-        raise HTTPException(staus_code=404,detail="api key not found")
+        raise HTTPException(status_code=404, detail="api key not found")
 
     return ApiKeyRotateResponse(
         id=row.id,
