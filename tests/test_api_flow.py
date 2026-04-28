@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 import routes.webhook_route as webhook_route
 import services.payment_service as payment_service
+from app import rate_limit
 from models.account import Account
 from models.api_key import ApiKey
 from models.ledger import Ledger
@@ -375,3 +376,45 @@ def test_api_keys_rotate(client, test_db_session: Session):
 
     new_auth = client.get("/v1/credits/balance", headers={"X-API-Key": new_key})
     assert new_auth.status_code == 200
+
+
+def test_rate_limiting_returns_429_after_limit(client, test_db_session: Session):
+    _create_user(test_db_session, user_id=1)
+    headers = {"X-API-Key": "test-api-key-1"}
+
+    first = client.get("/v1/credits/balance", headers=headers)
+    second = client.get("/v1/credits/balance", headers=headers)
+    third = client.get("/v1/credits/balance", headers=headers)
+    fourth = client.get("/v1/credits/balance", headers=headers)
+
+    assert first.status_code == 200
+    assert second.status_code == 200
+    assert third.status_code == 200
+    assert fourth.status_code == 429
+    assert fourth.json()["detail"] == "rate limit exceeded"
+    assert fourth.headers["X-RateLimit-Limit"] == "3"
+    assert fourth.headers["X-RateLimit-Remaining"] == "0"
+    assert int(fourth.headers["Retry-After"]) >= 1
+
+
+def test_rate_limiting_resets_after_window(client, test_db_session: Session, monkeypatch: pytest.MonkeyPatch):
+    _create_user(test_db_session, user_id=1)
+    headers = {"X-API-Key": "test-api-key-1"}
+
+    fake_time = {"now": 1000.0}
+
+    def _time() -> float:
+        return fake_time["now"]
+
+    monkeypatch.setattr(rate_limit.time, "time", _time)
+
+    for _ in range(3):
+        ok = client.get("/v1/credits/balance", headers=headers)
+        assert ok.status_code == 200
+
+    blocked = client.get("/v1/credits/balance", headers=headers)
+    assert blocked.status_code == 429
+
+    fake_time["now"] += 61
+    allowed_again = client.get("/v1/credits/balance", headers=headers)
+    assert allowed_again.status_code == 200

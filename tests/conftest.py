@@ -13,9 +13,11 @@ from sqlalchemy.pool import StaticPool
 os.environ.setdefault("DATABASE_URL", "sqlite+pysqlite:///:memory:")
 os.environ.setdefault("STRIPE_SECRET_KEY", "sk_test_dummy")
 os.environ.setdefault("STRIPE_WEBHOOK_SECRET", "whsec_dummy")
+os.environ.setdefault("RATE_LIMIT_MAX_REQUESTS", "3")
+os.environ.setdefault("RATE_LIMIT_WINDOW_SECONDS", "60")
 
 from app.database import Base, get_db  # noqa: E402
-from app.main import app  # noqa: E402
+from app.main import app, rate_limiter  # noqa: E402
 from models.account import Account  # noqa: F401,E402
 from models.ledger import Ledger  # noqa: F401,E402
 from models.topup_attempt import TopUpAttempt  # noqa: F401,E402
@@ -50,6 +52,8 @@ def client(test_db_session: Session) -> TestClient:
             pass
 
     app.dependency_overrides[get_db] = override_get_db
+    rate_limiter.reset()
     with TestClient(app) as test_client:
         yield test_client
+    rate_limiter.reset()
     app.dependency_overrides.clear()
