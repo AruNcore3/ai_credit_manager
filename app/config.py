@@ -2,6 +2,12 @@ import os
 
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
 STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET")
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+RATE_LIMIT_MAX_REQUESTS = int(os.getenv("RATE_LIMIT_MAX_REQUESTS", "60"))
+RATE_LIMIT_WINDOW_SECONDS = int(os.getenv("RATE_LIMIT_WINDOW_SECONDS", "60"))
+RATE_LIMIT_BACKEND = os.getenv("RATE_LIMIT_BACKEND", "redis")
+RATE_LIMIT_FAIL_OPEN = os.getenv("RATE_LIMIT_FAIL_OPEN", "true")
+RATE_LIMIT_INCLUDE_PATH = os.getenv("RATE_LIMIT_INCLUDE_PATH", "false")
 
 if not STRIPE_SECRET_KEY:
     raise RuntimeError("STRIPE_SECRET_KEY is missing")

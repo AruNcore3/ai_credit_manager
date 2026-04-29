@@ -15,6 +15,9 @@ os.environ.setdefault("STRIPE_SECRET_KEY", "sk_test_dummy")
 os.environ.setdefault("STRIPE_WEBHOOK_SECRET", "whsec_dummy")
 os.environ.setdefault("RATE_LIMIT_MAX_REQUESTS", "3")
 os.environ.setdefault("RATE_LIMIT_WINDOW_SECONDS", "60")
+os.environ.setdefault("RATE_LIMIT_BACKEND", "inmemory")
+os.environ.setdefault("RATE_LIMIT_FAIL_OPEN", "true")
+os.environ.setdefault("RATE_LIMIT_INCLUDE_PATH", "false")
 
 from app.database import Base, get_db  # noqa: E402
 from app.main import app, rate_limiter  # noqa: E402

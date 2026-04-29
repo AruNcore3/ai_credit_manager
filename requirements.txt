@@ -8,3 +8,4 @@ psycopg2-binary
 python-dotenv
 stripe
 pytest
+redis>=5.0.0

@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 
 from dotenv import load_dotenv
 
@@ -39,7 +40,9 @@ async def rate_limit_middleware(request: Request, call_next):
         return await call_next(request)
 
     key = request.headers.get("X-API-Key") or (request.client.host if request.client else "anonymous")
-    decision = rate_limiter.check(key)
+    include_path = os.getenv("RATE_LIMIT_INCLUDE_PATH", "false").strip().lower() in {"1", "true", "yes", "on"}
+    scope = request.url.path if include_path else None
+    decision = rate_limiter.check(key, scope=scope)
 
     if not decision.allowed:
         return JSONResponse(
@@ -68,4 +71,3 @@ app.include_router(api_key_router,prefix="/v1")
 app.include_router(payment_router)
 app.include_router(webhook_router)
 app.include_router(credit_router)
-
