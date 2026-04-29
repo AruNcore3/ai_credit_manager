@@ -418,3 +418,20 @@ def test_rate_limiting_resets_after_window(client, test_db_session: Session, mon
     fake_time["now"] += 61
     allowed_again = client.get("/v1/credits/balance", headers=headers)
     assert allowed_again.status_code == 200
+
+
+def test_rate_limiting_is_isolated_per_api_key(client, test_db_session: Session):
+    _create_user(test_db_session, user_id=1, api_key="test-api-key-1")
+    _create_user(test_db_session, user_id=2, api_key="test-api-key-2")
+
+    headers_one = {"X-API-Key": "test-api-key-1"}
+    headers_two = {"X-API-Key": "test-api-key-2"}
+
+    for _ in range(3):
+        assert client.get("/v1/credits/balance", headers=headers_one).status_code == 200
+
+    blocked = client.get("/v1/credits/balance", headers=headers_one)
+    assert blocked.status_code == 429
+
+    unaffected = client.get("/v1/credits/balance", headers=headers_two)
+    assert unaffected.status_code == 200

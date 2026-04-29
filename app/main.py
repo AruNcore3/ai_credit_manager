@@ -6,6 +6,9 @@ from dotenv import load_dotenv
 # Load project-root `.env` so Stripe keys work in PowerShell / IDE (not only fish + activate.fish).
 load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
+# Ensure all SQLAlchemy models are imported so relationship() string targets resolve.
+import models  # noqa: F401
+
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
