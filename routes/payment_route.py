@@ -1,4 +1,5 @@
 import uuid
+import logging
 import stripe
 from fastapi import APIRouter, Depends, Header, HTTPException
 from sqlalchemy.orm import Session
@@ -9,6 +10,7 @@ from schemas.wallet_schema import TopUpIntentRequest, TopUpIntentResponse
 from services.payment_service import create_topup_intent
 
 router = APIRouter(prefix="/payments", tags=["payments"])
+logger = logging.getLogger(__name__)
 
 @router.post("/topup-intent", response_model=TopUpIntentResponse)
 def topup_intent(
@@ -30,9 +32,22 @@ def topup_intent(
         )
     except ValueError as exc:
         db.rollback()
+        logger.warning(
+            "topup_intent_rejected user_id=%s credits=%s reason=%s",
+            current_user.id,
+            body.credits,
+            str(exc),
+        )
         raise HTTPException(status_code=400, detail=str(exc))
     except stripe.error.StripeError as exc:
         db.rollback()
+        logger.error(
+            "topup_intent_stripe_error user_id=%s credits=%s idempotency_key=%s error=%s",
+            current_user.id,
+            body.credits,
+            key,
+            str(exc),
+        )
         raise HTTPException(status_code=400, detail=f"stripe error: {str(exc)}")
 
     return TopUpIntentResponse(

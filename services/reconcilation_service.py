@@ -71,7 +71,11 @@ def reconile_initiated_topups(db:Session,older_than_minutes:int=5,limit:int=100)
         except Exception as e:
             db.rollback()
             summary["error"] += 1
-
-            print(f"[error] failed to process attempt {attempt.id}:{str(e)}")
+            logger.exception(
+                "reconciliation_attempt_error attempt_id=%s stripe_payment_intent_id=%s error=%s",
+                attempt.id,
+                attempt.stripe_payment_intent_id,
+                str(e),
+            )
     return summary
 

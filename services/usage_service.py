@@ -1,5 +1,6 @@
 import math
 import os
+import logging
 
 from sqlalchemy.orm import Session
 
@@ -9,6 +10,7 @@ from schemas.usage_schema import UsageRecordRequest, UsageRecordResponse
 
 INPUT_CREDIT_PER_1K = float(os.getenv("INPUT_CREDIT_PER_1K", "1"))
 OUTPUT_CREDIT_PER_1K = float(os.getenv("OUTPUT_CREDIT_PER_1K", "2"))
+logger = logging.getLogger(__name__)
 
 
 def credit_for_usage(input_token: int, output_token: int) -> int:
@@ -75,6 +77,13 @@ def record_usage(
     except InsufficientCreditsError:
         db.rollback()
         wallet = get_or_create_wallet(db, user_id=user_id)
+        logger.info(
+            "insufficient_credits user_id=%s event_id=%s requested=%s balance=%s",
+            user_id,
+            payload.event_id,
+            credit_to_debits,
+            wallet.balance,
+        )
         return UsageRecordResponse(
             event_id=payload.event_id,
             debited_credits=0,

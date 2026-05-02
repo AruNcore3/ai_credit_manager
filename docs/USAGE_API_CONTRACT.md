@@ -10,6 +10,12 @@
 - `POST /v1/webhooks/stripe`
 - `POST /v1/usage/record`
 
+## OpenAPI Document
+- Swagger UI: `http://localhost:8000/docs`
+- OpenAPI JSON: `http://localhost:8000/openapi.json`
+
+You can import `openapi.json` into Postman or other API clients.
+
 Legacy compatibility (deprecated, temporary until `Tue, 24 Jun 2026 00:00:00 GMT`):
 - `POST /payments/topup-intent`
 - `GET /credits/balance`

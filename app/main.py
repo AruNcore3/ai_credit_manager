@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+import logging
 
 from dotenv import load_dotenv
 
@@ -18,6 +19,8 @@ from routes.credit_route import router as credit_router
 from routes.usage_route import router as usage_router
 from routes.api_key_route import router as api_key_router
 from app.rate_limit import build_rate_limiter
+
+logger = logging.getLogger(__name__)
 app = FastAPI()
 rate_limiter = build_rate_limiter()
 
@@ -48,6 +51,14 @@ async def rate_limit_middleware(request: Request, call_next):
     decision = rate_limiter.check(key, scope=scope)
 
     if not decision.allowed:
+        logger.warning(
+            "rate_limit_exceeded path=%s scope=%s key=%s limit=%s reset_after=%s",
+            request.url.path,
+            scope,
+            key[:16],
+            decision.limit,
+            decision.reset_after,
+        )
         return JSONResponse(
             status_code=429,
             content={"detail": "rate limit exceeded"},
