@@ -18,10 +18,20 @@ from routes.webhook_route import router as webhook_router
 from routes.credit_route import router as credit_router
 from routes.usage_route import router as usage_router
 from routes.api_key_route import router as api_key_router
+from routes.onboarding_route import router as onboarding_router
+from routes.admin_route import router as admin_router
 from app.rate_limit import build_rate_limiter
 
 logger = logging.getLogger(__name__)
-app = FastAPI()
+app = FastAPI(
+    title="AI Credit Billing API",
+    version="1.0.0",
+    description="Hosted multi-tenant API for credits, usage metering, payments, and webhooks.",
+    contact={"name": "Support", "email": "support@yourdomain.com"},
+    openapi_url="/openapi.json",
+    docs_url="/docs",
+    redoc_url="/reference",
+)
 rate_limiter = build_rate_limiter()
 
 @app.get("/")
@@ -80,6 +90,8 @@ app.include_router(webhook_router, prefix="/v1")
 app.include_router(credit_router, prefix="/v1")
 app.include_router(usage_router)
 app.include_router(api_key_router,prefix="/v1")
+app.include_router(onboarding_router, prefix="/v1")
+app.include_router(admin_router, prefix="/v1")
 
 # Temporary legacy routes (deprecated by middleware header)
 app.include_router(payment_router)

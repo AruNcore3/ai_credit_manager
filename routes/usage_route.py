@@ -5,6 +5,7 @@ from app.database import get_db
 from models.users import User
 from schemas.usage_schema import UsageRecordRequest, UsageRecordResponse
 from services.usage_service import record_usage
+from services.tenant_service import QuotaExceededError
 
 router = APIRouter(prefix="/v1/usage", tags=["usage"])
 
@@ -17,6 +18,8 @@ def usage_record(
     try:
         result = record_usage(db=db, user_id=current_user.id, payload=body)
         return result
+    except QuotaExceededError as exc:
+        raise HTTPException(status_code=429, detail=str(exc))
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
 

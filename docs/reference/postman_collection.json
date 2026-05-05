@@ -1,0 +1,29 @@
+{
+  "info": {
+    "name": "AI Credit Billing API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Signup",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "url": "{{base_url}}/onboarding/signup",
+        "body": {"mode": "raw", "raw": "{\n  \"account_name\": \"acme\",\n  \"username\": \"owner\",\n  \"email\": \"owner@acme.com\",\n  \"password\": \"replace-me-123\"\n}"}
+      }
+    },
+    {
+      "name": "Balance",
+      "request": {
+        "method": "GET",
+        "header": [{"key": "X-API-Key", "value": "{{api_key}}"}],
+        "url": "{{base_url}}/credits/balance"
+      }
+    }
+  ],
+  "variable": [
+    {"key": "base_url", "value": "https://api.yourdomain.com/v1"},
+    {"key": "api_key", "value": ""}
+  ]
+}

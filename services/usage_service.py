@@ -4,9 +4,11 @@ import logging
 
 from sqlalchemy.orm import Session
 
+from models.users import User
 from models.ledger import Ledger
 from models.wallet import InsufficientCreditsError, get_or_create_wallet, spend_credits
 from schemas.usage_schema import UsageRecordRequest, UsageRecordResponse
+from services.tenant_service import QuotaExceededError, enforce_account_usage_quota
 
 INPUT_CREDIT_PER_1K = float(os.getenv("INPUT_CREDIT_PER_1K", "1"))
 OUTPUT_CREDIT_PER_1K = float(os.getenv("OUTPUT_CREDIT_PER_1K", "2"))
@@ -60,6 +62,11 @@ def record_usage(
         )
 
     try:
+        user = db.query(User).filter(User.id == user_id).one()
+        if not user.is_active or user.account.is_suspended:
+            raise ValueError("account is suspended")
+        enforce_account_usage_quota(db, user.account, credit_to_debits)
+
         wallet = spend_credits(
             db,
             user_id=user_id,
@@ -90,3 +97,6 @@ def record_usage(
             remaining_balance=wallet.balance,
             topup_required=True,
         )
+    except QuotaExceededError:
+        db.rollback()
+        raise

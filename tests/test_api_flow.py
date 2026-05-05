@@ -435,3 +435,43 @@ def test_rate_limiting_is_isolated_per_api_key(client, test_db_session: Session)
 
     unaffected = client.get("/v1/credits/balance", headers=headers_two)
     assert unaffected.status_code == 200
+
+
+def test_signup_creates_tenant_and_default_api_key(client):
+    response = client.post(
+        "/v1/onboarding/signup",
+        json={
+            "account_name": "acme",
+            "username": "owner",
+            "email": "owner@acme.test",
+            "password": "supersecret1",
+        },
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["account_id"] > 0
+    assert body["user_id"] > 0
+    assert body["api_key"].startswith("ak_live_")
+
+
+def test_usage_quota_returns_429_when_exceeded(client, test_db_session: Session):
+    _create_user(test_db_session, user_id=1)
+    account = test_db_session.query(Account).filter(Account.id == 1).one_or_none()
+    assert account is not None
+    account.monthly_credit_quota = 2
+    test_db_session.commit()
+    add_credits(test_db_session, user_id=1, amount=100, reference="seed")
+    test_db_session.commit()
+
+    response = client.post(
+        "/v1/usage/record",
+        headers={"X-API-Key": "test-api-key-1"},
+        json={
+            "event_id": "evt_usage_quota",
+            "model": "gpt-test",
+            "input_token": 1000,
+            "output_token": 1000,
+        },
+    )
+    assert response.status_code == 429
+    assert response.json()["detail"] == "monthly quota exceeded for this account"

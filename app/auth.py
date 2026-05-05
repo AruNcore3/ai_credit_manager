@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 from fastapi import Depends, Header, HTTPException
@@ -35,3 +36,13 @@ def get_current_user(
     db.commit()
 
     return user
+
+
+def require_admin(
+    x_admin_token: str | None = Header(default=None, alias="X-Admin-Token"),
+) -> None:
+    configured = os.getenv("ADMIN_TOKEN")
+    if not configured:
+        raise HTTPException(status_code=503, detail="admin controls are not configured")
+    if not x_admin_token or x_admin_token != configured:
+        raise HTTPException(status_code=403, detail="forbidden")
