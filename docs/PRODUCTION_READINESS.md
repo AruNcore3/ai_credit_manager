@@ -52,10 +52,18 @@
 ## 18) CI/CD Gates
 - Added baseline CI workflow in `.github/workflows/ci.yml`.
 - Extend with lint + migration check + release workflow.
+- Implemented:
+  - compile/import gate (`python -m compileall ...`)
+  - migration gate (`alembic upgrade head`)
+  - automated SDK build checks (Python wheel/sdist + `twine check`)
+  - tag-based SDK publish workflow (`.github/workflows/publish-sdks.yml`)
 
 ## 19) Contract/Integration Tests
 - Existing integration-like API tests in `tests/test_api_flow.py`.
-- Add deployed-environment smoke tests using real base URL.
+- Implemented deployed-environment smoke workflow:
+  - `.github/workflows/deployed-contract-tests.yml`
+  - `tests/test_deployed_contract.py`
+  - Requires secrets: `DEPLOYED_BASE_URL`, optional `DEPLOYED_API_KEY`
 
 ## 20) Legal/Product Readiness
 - Publish Terms, Pricing, SLA, and Support policy pages before GA.

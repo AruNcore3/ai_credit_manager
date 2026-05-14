@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: billbridge-api
+    runtime: python
+    plan: starter
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: API_KEY_HASH_SECRET
+        sync: false
+      - key: ADMIN_TOKEN
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: RATE_LIMIT_BACKEND
+        value: redis
+      - key: RATE_LIMIT_MAX_REQUESTS
+        value: "60"
+      - key: RATE_LIMIT_WINDOW_SECONDS
+        value: "60"
+      - key: RATE_LIMIT_FAIL_OPEN
+        value: "true"
+      - key: RATE_LIMIT_INCLUDE_PATH
+        value: "false"

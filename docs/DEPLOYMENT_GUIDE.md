@@ -25,6 +25,11 @@ Recommended:
 - Use a managed PostgreSQL and managed Redis.
 - Rotate `API_KEY_HASH_SECRET` with an explicit migration plan.
 
+Render-specific checks:
+- Do not use `localhost` for `DATABASE_URL` in Render.
+- Use the Render Postgres connection string from your Render database service.
+- Keep `DATABASE_URL` as an environment variable in Render dashboard (or Blueprint sync).
+
 ## 2) Install and run migrations
 
 Run once per release before serving traffic:
@@ -45,6 +50,29 @@ Behind a reverse proxy/load balancer:
 - Terminate TLS at proxy/LB.
 - Forward traffic to app on port `8000`.
 - Preserve headers needed for tracing/logging.
+
+Render production start command:
+```bash
+alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+```
+
+This is already captured in `render.yaml`.
+
+## 3.1) Render domain and DNS
+
+For this project:
+- Public API domain: `https://api.billbridge.in`
+- Render origin: `bill-bridge-32mb.onrender.com`
+
+DNS record in your domain provider:
+- Type: `CNAME`
+- Host/Name: `api`
+- Target/Value: `bill-bridge-32mb.onrender.com`
+
+After DNS propagation and cert issuance, verify:
+1. `https://api.billbridge.in/openapi.json`
+2. `https://api.billbridge.in/docs`
+3. `https://api.billbridge.in/v1/credits/balance` with `X-API-Key`
 
 ## 4) Stripe webhook setup
 
