@@ -1,11 +1,10 @@
 python-dotenv>=1.0.0
 stripe>=10.0.0
 fastapi
-uvicorn 
+uvicorn
 pydantic
 sqlalchemy
-psycopg2-binary 
-python-dotenv
-stripe
+psycopg2-binary
+alembic
 pytest
 redis>=5.0.0
