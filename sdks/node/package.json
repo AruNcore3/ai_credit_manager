@@ -1,7 +1,27 @@
 {
-  "name": "@your-org/ai-credit-sdk",
-  "version": "1.0.0",
+  "name": "billbridge-ai-credit-sdk",
+  "version": "1.0.1",
+  "description": "Official Node.js SDK for the Billbridge AI Credit Billing API",
+  "homepage": "https://api.billbridge.in/docs",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AruNcore3/ai_credit_manager.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AruNcore3/ai_credit_manager/issues"
+  },
+  "keywords": [
+    "billbridge",
+    "billing",
+    "credits",
+    "api",
+    "sdk",
+    "saas"
+  ],
   "type": "module",
   "main": "src/index.js",
+  "files": [
+    "src"
+  ],
   "license": "MIT"
 }
