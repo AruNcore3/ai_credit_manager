@@ -18,7 +18,8 @@ if APP_ENV in {"development", "dev", "local", "test"}:
 import models  # noqa: F401
 
 from fastapi import Depends, FastAPI, Request
-from fastapi.responses import JSONResponse, PlainTextResponse
+from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse
+from fastapi.staticfiles import StaticFiles
 
 from routes.payment_route import router as payment_router
 from routes.webhook_route import router as webhook_router
@@ -36,6 +37,8 @@ from models.users import User
 from utils.api_keys import hash_api_key
 
 logger = logging.getLogger(__name__)
+frontend_dir = Path(__file__).resolve().parent.parent / "frontend"
+developer_index = frontend_dir / "index.html"
 app = FastAPI(
     title="Billbridge API",
     version="1.0.0",
@@ -61,10 +64,19 @@ if cors_allowed_origins:
         allow_methods=["GET", "POST", "PATCH", "OPTIONS"],
         allow_headers=["Content-Type", "X-API-Key", "Idempotency-Key", "X-Admin-Token"],
     )
+if frontend_dir.exists():
+    app.mount("/developer-assets", StaticFiles(directory=str(frontend_dir)), name="developer-assets")
 
 @app.get("/")
 def home():
     return {"message": "Hello, World!"}
+
+
+@app.get("/developer", include_in_schema=False)
+def developer_docs():
+    if not developer_index.exists():
+        return JSONResponse(status_code=404, content={"detail": "developer docs are not available"})
+    return FileResponse(developer_index)
 
 
 @app.get("/internal/metrics", response_class=PlainTextResponse, dependencies=[Depends(require_admin)])

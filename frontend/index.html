@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Billbridge Developer Docs</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --text: #1f2933;
+      --muted: #52606d;
+      --line: #d9e2ec;
+      --brand: #0b6e4f;
+      --brand-dark: #084c37;
+      --code-bg: #111827;
+      --code-text: #e6edf7;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.45;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 24px 16px 48px;
+    }
+
+    .hero {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 20px;
+      animation: fadeRise .5s ease both;
+    }
+
+    .kicker {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: var(--brand);
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .links {
+      margin-top: 14px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      text-decoration: none;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      padding: 9px 12px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease;
+    }
+
+    .btn.primary {
+      background: var(--brand);
+      border-color: var(--brand);
+      color: #fff;
+    }
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(10, 40, 30, 0.12);
+    }
+
+    .btn.secondary {
+      background: #fff;
+      color: var(--brand-dark);
+    }
+
+    .section {
+      margin-top: 14px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      opacity: 0;
+      transform: translateY(8px);
+      animation: fadeRise .45s ease forwards;
+    }
+    .section:nth-of-type(1) { animation-delay: .06s; }
+    .section:nth-of-type(2) { animation-delay: .12s; }
+    .section:nth-of-type(3) { animation-delay: .18s; }
+    .section:nth-of-type(4) { animation-delay: .24s; }
+    .section:nth-of-type(5) { animation-delay: .30s; }
+
+    .section h2 {
+      margin: 0 0 8px;
+      font-size: 20px;
+    }
+
+    .section p {
+      margin: 0 0 10px;
+      color: var(--muted);
+    }
+
+    .code {
+      background: var(--code-bg);
+      color: var(--code-text);
+      border-radius: 10px;
+      border: 1px solid #243244;
+      position: relative;
+      overflow: auto;
+      padding: 12px;
+    }
+
+    pre {
+      margin: 0;
+      font-size: 13px;
+      white-space: pre-wrap;
+    }
+
+    .copy {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      border: 1px solid #3b4f69;
+      border-radius: 8px;
+      background: #182538;
+      color: #dceafc;
+      font-size: 12px;
+      padding: 4px 8px;
+      cursor: pointer;
+      transition: transform .16s ease, background-color .16s ease;
+    }
+    .copy:hover {
+      transform: translateY(-1px);
+      background: #22324a;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    li { margin-bottom: 6px; }
+
+    footer {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    @media (min-width: 900px) {
+      .grid { grid-template-columns: 1fr 1fr; }
+      .full { grid-column: 1 / -1; }
+    }
+
+    @keyframes fadeRise {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero, .section, .btn, .copy {
+        animation: none !important;
+        transition: none !important;
+      }
+      .section {
+        opacity: 1;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="hero">
+      <span class="kicker">Billbridge API</span>
+      <h1>Simple Developer Docs</h1>
+      <p class="subtitle">
+        Start here instead of Swagger. Base URL:
+        <strong id="baseUrlLabel">https://api.billbridge.in/v1</strong>
+      </p>
+      <div class="links">
+        <a class="btn primary" href="/docs" target="_blank" rel="noreferrer">Swagger</a>
+        <a class="btn secondary" href="/reference" target="_blank" rel="noreferrer">ReDoc</a>
+        <a class="btn secondary" href="/openapi.json" target="_blank" rel="noreferrer">OpenAPI JSON</a>
+      </div>
+    </section>
+
+    <div class="grid">
+      <section class="section">
+        <h2>1) Get Your API Key</h2>
+        <p>Signup returns your first key in the <code>api_key</code> field.</p>
+        <div class="code">
+          <button class="copy" data-copy="signupCmd">Copy</button>
+          <pre id="signupCmd"></pre>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>2) Test The Key</h2>
+        <p>Use <code>X-API-Key</code> on any <code>/v1</code> endpoint.</p>
+        <div class="code">
+          <button class="copy" data-copy="balanceCmd">Copy</button>
+          <pre id="balanceCmd"></pre>
+        </div>
+      </section>
+
+      <section class="section full">
+        <h2>3) Common API Calls</h2>
+        <p>Usage, topup, and key creation in one snippet.</p>
+        <div class="code">
+          <button class="copy" data-copy="usageCmd">Copy</button>
+          <pre id="usageCmd"></pre>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>4) Key Management</h2>
+        <ul>
+          <li><code>POST /v1/api-keys</code> create key</li>
+          <li><code>GET /v1/api-keys</code> list keys</li>
+          <li><code>POST /v1/api-keys/{key_id}/rotate</code> rotate</li>
+          <li><code>POST /v1/api-keys/{key_id}/revoke</code> revoke</li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <h2>5) SDK</h2>
+        <p>Python is production-ready. Node package command included.</p>
+        <div class="code">
+          <button class="copy" data-copy="sdkCmd">Copy</button>
+          <pre id="sdkCmd"></pre>
+        </div>
+      </section>
+    </div>
+
+    <footer>Billbridge Developer Docs · <span id="year"></span></footer>
+  </div>
+  <script src="/developer-assets/app.js"></script>
+</body>
+</html>
