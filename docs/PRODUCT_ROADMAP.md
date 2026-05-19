@@ -1,4 +1,4 @@
-# AI Credit Billing API - Product Roadmap
+# Billbridge API - Product Roadmap
 
 ## 1) Product Vision
 Build a developer-facing billing API for AI SaaS products that enables:

@@ -24,7 +24,7 @@ from app.rate_limit import build_rate_limiter
 
 logger = logging.getLogger(__name__)
 app = FastAPI(
-    title="AI Credit Billing API",
+    title="Billbridge API",
     version="1.0.0",
     description="Hosted multi-tenant API for credits, usage metering, payments, and webhooks.",
     contact={"name": "Support", "email": "support@yourdomain.com"},

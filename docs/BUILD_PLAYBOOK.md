@@ -1,4 +1,4 @@
-# AI Credit Billing API - Build Playbook
+# Billbridge API - Build Playbook
 
 Use this as your execution checklist whenever you resume work.
 

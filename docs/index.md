@@ -1,4 +1,4 @@
-# AI Credit Billing API Docs
+# Billbridge API Docs
 
 Welcome to the public developer documentation.
 
