@@ -79,6 +79,17 @@ def developer_docs():
     return FileResponse(developer_index)
 
 
+@app.get("/developer/{page}", include_in_schema=False)
+def developer_page(page: str):
+    allowed_pages = {"quickstart", "auth", "sdk"}
+    if page not in allowed_pages:
+        return JSONResponse(status_code=404, content={"detail": "page not found"})
+    target = frontend_dir / f"{page}.html"
+    if not target.exists():
+        return JSONResponse(status_code=404, content={"detail": "page not found"})
+    return FileResponse(target)
+
+
 @app.get("/internal/metrics", response_class=PlainTextResponse, dependencies=[Depends(require_admin)])
 def metrics():
     return observability.render_prometheus()

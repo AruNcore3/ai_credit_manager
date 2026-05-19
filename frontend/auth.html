@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Billbridge Auth & API Keys</title>
+  <style>
+    :root { --bg:#f6f8fa; --card:#fff; --text:#1f2328; --muted:#57606a; --line:#d0d7de; --brand:#0969da; }
+    body { margin:0; font-family:"Segoe UI",Arial,sans-serif; background:var(--bg); color:var(--text); }
+    .wrap { max-width:960px; margin:0 auto; padding:20px 16px 40px; }
+    .box { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; margin-bottom:12px; }
+    h1 { margin:0; font-size:26px; }
+    h2 { margin:0 0 8px; font-size:18px; }
+    p, li { color:var(--muted); line-height:1.5; }
+    a { text-decoration:none; color:var(--brand); font-weight:600; }
+    code { background:#f3f4f6; border:1px solid #e5e7eb; border-radius:6px; padding:1px 5px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="box">
+      <h1>Auth & API Key Guide</h1>
+      <p>How to authenticate requests and manage keys safely.</p>
+      <a href="/developer">← Back to docs home</a>
+    </section>
+    <section class="box">
+      <h2>Header</h2>
+      <p>Send your key in <code>X-API-Key</code> for all <code>/v1</code> endpoints.</p>
+    </section>
+    <section class="box">
+      <h2>Key Lifecycle</h2>
+      <ul>
+        <li>Create key: <code>POST /v1/api-keys</code></li>
+        <li>List keys: <code>GET /v1/api-keys</code></li>
+        <li>Rotate key: <code>POST /v1/api-keys/{key_id}/rotate</code></li>
+        <li>Revoke key: <code>POST /v1/api-keys/{key_id}/revoke</code></li>
+      </ul>
+    </section>
+    <section class="box">
+      <h2>Security Practices</h2>
+      <ul>
+        <li>Keep keys in environment variables.</li>
+        <li>Never commit keys to source control.</li>
+        <li>Rotate keys every 90 days or immediately after exposure.</li>
+        <li>Deploy new key first, then revoke the old one.</li>
+      </ul>
+    </section>
+  </div>
+</body>
+</html>
