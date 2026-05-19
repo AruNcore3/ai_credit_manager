@@ -18,6 +18,10 @@ RATE_LIMIT_MAX_REQUESTS=60
 RATE_LIMIT_WINDOW_SECONDS=60
 RATE_LIMIT_FAIL_OPEN=true
 RATE_LIMIT_INCLUDE_PATH=false
+ALERT_429_PER_MINUTE=100
+ALERT_WEBHOOK_SIG_FAIL_PER_MINUTE=5
+ALERT_STRIPE_FAILURES_PER_MINUTE=5
+ALERT_RECONCILIATION_ERRORS_PER_MINUTE=3
 ```
 
 Recommended:
@@ -139,6 +143,14 @@ Event signals now emitted by service logs:
 - `stripe_webhook_invalid_signature` (webhook auth failures)
 - `insufficient_credits` (usage request exceeded balance)
 - `reconciliation_summary` and `reconciliation_attempt_error` (worker health/outliers)
+- `alert_triggered type=...` (threshold-based critical alert signal)
+
+Metrics endpoint:
+- `GET /internal/metrics` (requires `X-Admin-Token`)
+- Prometheus-style counters/gauges:
+  - `billbridge_requests_total{method,path,status}`
+  - `billbridge_events_total{event}`
+  - `billbridge_request_latency_ms_avg{method,path}`
 
 Alerting baseline:
 1. `rate_limit_exceeded` above normal per minute.
@@ -146,6 +158,7 @@ Alerting baseline:
 3. `stripe_webhook_invalid_signature` > 0 in production.
 4. `reconciliation_attempt_error` > 0 or `summary.error > 0`.
 5. sustained increase in `insufficient_credits` against baseline.
+6. high `5xx` share derived from `billbridge_requests_total` by status.
 
 ## 8) Release checklist
 

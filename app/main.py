@@ -1,6 +1,8 @@
 from pathlib import Path
 import os
 import logging
+import time
+import uuid
 
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,8 +17,8 @@ if APP_ENV in {"development", "dev", "local", "test"}:
 # Ensure all SQLAlchemy models are imported so relationship() string targets resolve.
 import models  # noqa: F401
 
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi import Depends, FastAPI, Request
+from fastapi.responses import JSONResponse, PlainTextResponse
 
 from routes.payment_route import router as payment_router
 from routes.webhook_route import router as webhook_router
@@ -26,6 +28,8 @@ from routes.api_key_route import router as api_key_router
 from routes.onboarding_route import router as onboarding_router
 from routes.admin_route import router as admin_router
 from app.rate_limit import build_rate_limiter
+from app.observability import observability
+from app.auth import require_admin
 from app.database import SessionLocal
 from models.api_key import ApiKey
 from models.users import User
@@ -62,6 +66,11 @@ if cors_allowed_origins:
 def home():
     return {"message": "Hello, World!"}
 
+
+@app.get("/internal/metrics", response_class=PlainTextResponse, dependencies=[Depends(require_admin)])
+def metrics():
+    return observability.render_prometheus()
+
 @app.middleware("http")
 async def legacy_deprecation_middleware(request: Request, call_next):
     response = await call_next(request)
@@ -76,8 +85,19 @@ async def legacy_deprecation_middleware(request: Request, call_next):
 
 @app.middleware("http")
 async def rate_limit_middleware(request: Request, call_next):
+    request_id = request.headers.get("X-Request-ID") or str(uuid.uuid4())
+    request.state.request_id = request_id
+    started = time.perf_counter()
     if not request.url.path.startswith("/v1"):
-        return await call_next(request)
+        response = await call_next(request)
+        response.headers["X-Request-ID"] = request_id
+        observability.observe_request(
+            method=request.method,
+            path=request.url.path,
+            status=response.status_code,
+            latency_ms=(time.perf_counter() - started) * 1000,
+        )
+        return response
 
     api_key = request.headers.get("X-API-Key")
     key = request.client.host if request.client else "anonymous"
@@ -106,15 +126,17 @@ async def rate_limit_middleware(request: Request, call_next):
     decision = rate_limiter.check(key, scope=scope)
 
     if not decision.allowed:
+        observability.increment_event("rate_limit_exceeded")
         logger.warning(
-            "rate_limit_exceeded path=%s scope=%s key=%s limit=%s reset_after=%s",
+            "rate_limit_exceeded request_id=%s path=%s scope=%s key=%s limit=%s reset_after=%s",
+            request_id,
             request.url.path,
             scope,
             key[:16],
             decision.limit,
             decision.reset_after,
         )
-        return JSONResponse(
+        response = JSONResponse(
             status_code=429,
             content={"detail": "rate limit exceeded"},
             headers={
@@ -123,10 +145,25 @@ async def rate_limit_middleware(request: Request, call_next):
                 "X-RateLimit-Remaining": "0",
             },
         )
+        response.headers["X-Request-ID"] = request_id
+        observability.observe_request(
+            method=request.method,
+            path=request.url.path,
+            status=429,
+            latency_ms=(time.perf_counter() - started) * 1000,
+        )
+        return response
 
     response = await call_next(request)
+    response.headers["X-Request-ID"] = request_id
     response.headers["X-RateLimit-Limit"] = str(decision.limit)
     response.headers["X-RateLimit-Remaining"] = str(decision.remaining)
+    observability.observe_request(
+        method=request.method,
+        path=request.url.path,
+        status=response.status_code,
+        latency_ms=(time.perf_counter() - started) * 1000,
+    )
     return response
 
 # Versioned routes

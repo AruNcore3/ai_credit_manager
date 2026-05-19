@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException
 from sqlalchemy.orm import Session
 from app.auth import get_current_user
 from app.database import get_db
+from app.observability import observability
 from models.users import User
 from schemas.wallet_schema import TopUpIntentRequest, TopUpIntentResponse
 from services.audit_service import log_audit_event
@@ -42,6 +43,7 @@ def topup_intent(
         raise HTTPException(status_code=400, detail=str(exc))
     except stripe.error.StripeError as exc:
         db.rollback()
+        is_alert = observability.increment_event("topup_intent_stripe_error")
         logger.error(
             "topup_intent_stripe_error user_id=%s credits=%s idempotency_key=%s error=%s",
             current_user.id,
@@ -49,6 +51,8 @@ def topup_intent(
             key,
             str(exc),
         )
+        if is_alert:
+            logger.error("alert_triggered type=stripe_failures threshold_window=60s")
         raise HTTPException(status_code=400, detail=f"stripe error: {str(exc)}")
     log_audit_event(
         db,

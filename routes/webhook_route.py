@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from sqlalchemy.orm import Session
 from app.config import STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET
 from app.database import get_db
+from app.observability import observability
 from services.credit_service import apply_paid_topup_once
 
 stripe.api_key = STRIPE_SECRET_KEY
@@ -25,7 +26,10 @@ async def stripe_webhook(
             secret=STRIPE_WEBHOOK_SECRET,
         )
     except Exception:
+        is_alert = observability.increment_event("stripe_webhook_invalid_signature")
         logger.warning("stripe_webhook_invalid_signature")
+        if is_alert:
+            logger.error("alert_triggered type=webhook_signature_failures threshold_window=60s")
         raise HTTPException(status_code=400, detail="invalid webhook signature")
 
     event_type = event["type"]
