@@ -17,6 +17,7 @@ from services.api_key_service import (
     revoke_api_key,
     rotate_api_key,
 )
+from services.audit_service import log_audit_event
 
 router = APIRouter(prefix="/api-keys", tags=["api-keys"])
 
@@ -31,6 +32,17 @@ def create_key(
         row, raw_key = create_api_key(db, user_id=current_user.id, name=body.name)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
+    log_audit_event(
+        db,
+        actor_type="user",
+        actor_id=str(current_user.id),
+        account_id=current_user.account_id,
+        action="api_key.create",
+        target_type="api_key",
+        target_id=str(row.id),
+        metadata={"name": row.name, "key_prefix": row.key_prefix},
+    )
+    db.commit()
 
     return ApiKeyCreateResponse(
         id=row.id,
@@ -39,8 +51,6 @@ def create_key(
         api_key=raw_key,
         created_at=row.created_at,
     )
-
-
 @router.get("", response_model=list[ApiKeyItem])
 def list_keys(
     db: Session = Depends(get_db),
@@ -60,6 +70,16 @@ def revoke_key(
         row = revoke_api_key(db, user_id=current_user.id, key_id=key_id)
     except ValueError:
         raise HTTPException(status_code=404, detail="api key not found")
+    log_audit_event(
+        db,
+        actor_type="user",
+        actor_id=str(current_user.id),
+        account_id=current_user.account_id,
+        action="api_key.revoke",
+        target_type="api_key",
+        target_id=str(row.id),
+    )
+    db.commit()
 
     return ApiKeyRevokeResponse(
         id=row.id,
@@ -77,6 +97,16 @@ def rotate_key(
         row, raw_key = rotate_api_key(db, user_id=current_user.id, key_id=key_id)
     except ValueError:
         raise HTTPException(status_code=404, detail="api key not found")
+    log_audit_event(
+        db,
+        actor_type="user",
+        actor_id=str(current_user.id),
+        account_id=current_user.account_id,
+        action="api_key.rotate",
+        target_type="api_key",
+        target_id=str(row.id),
+    )
+    db.commit()
 
     return ApiKeyRotateResponse(
         id=row.id,
@@ -85,4 +115,3 @@ def rotate_key(
         api_key=raw_key,
         created_at=row.created_at,
     )
-

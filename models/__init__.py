@@ -6,6 +6,7 @@ Importing model modules here ensures SQLAlchemy relationship strings
 """
 
 from models.account import Account
+from models.audit_event import AuditEvent
 from models.api_key import ApiKey
 from models.ledger import Ledger
 from models.topup_attempt import TopUpAttempt
@@ -14,6 +15,7 @@ from models.wallet import Wallet
 
 __all__ = [
     "Account",
+    "AuditEvent",
     "ApiKey",
     "Ledger",
     "TopUpAttempt",

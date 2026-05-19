@@ -3,9 +3,14 @@ import os
 import logging
 
 from dotenv import load_dotenv
+from fastapi.middleware.cors import CORSMiddleware
 
-# Load project-root `.env` so Stripe keys work in PowerShell / IDE (not only fish + activate.fish).
-load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+# Load `.env` only for local development.
+APP_ENV = os.getenv("APP_ENV", "development").strip().lower()
+if APP_ENV in {"development", "dev", "local", "test"}:
+    env_path = Path(__file__).resolve().parent.parent / ".env"
+    if env_path.exists():
+        load_dotenv(env_path)
 
 # Ensure all SQLAlchemy models are imported so relationship() string targets resolve.
 import models  # noqa: F401
@@ -21,6 +26,10 @@ from routes.api_key_route import router as api_key_router
 from routes.onboarding_route import router as onboarding_router
 from routes.admin_route import router as admin_router
 from app.rate_limit import build_rate_limiter
+from app.database import SessionLocal
+from models.api_key import ApiKey
+from models.users import User
+from utils.api_keys import hash_api_key
 
 logger = logging.getLogger(__name__)
 app = FastAPI(
@@ -33,6 +42,21 @@ app = FastAPI(
     redoc_url="/reference",
 )
 rate_limiter = build_rate_limiter()
+cors_allowed_origins = [
+    origin.strip()
+    for origin in os.getenv("CORS_ALLOW_ORIGINS", "").split(",")
+    if origin.strip()
+]
+if APP_ENV in {"production", "prod"} and not cors_allowed_origins:
+    raise RuntimeError("CORS_ALLOW_ORIGINS is required in production")
+if cors_allowed_origins:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=cors_allowed_origins,
+        allow_credentials=False,
+        allow_methods=["GET", "POST", "PATCH", "OPTIONS"],
+        allow_headers=["Content-Type", "X-API-Key", "Idempotency-Key", "X-Admin-Token"],
+    )
 
 @app.get("/")
 def home():
@@ -55,7 +79,28 @@ async def rate_limit_middleware(request: Request, call_next):
     if not request.url.path.startswith("/v1"):
         return await call_next(request)
 
-    key = request.headers.get("X-API-Key") or (request.client.host if request.client else "anonymous")
+    api_key = request.headers.get("X-API-Key")
+    key = request.client.host if request.client else "anonymous"
+    if api_key:
+        db = None
+        try:
+            db = SessionLocal()
+            hashed = hash_api_key(api_key)
+            user = (
+                db.query(User)
+                .join(ApiKey, ApiKey.user_id == User.id)
+                .filter(ApiKey.key_hash == hashed, ApiKey.revoked_at.is_(None))
+                .one_or_none()
+            )
+            if user is not None:
+                key = f"tenant:{user.account_id}:key:{hashed[:16]}"
+            else:
+                key = f"unknown:{hashed[:16]}"
+        except Exception:
+            key = "anonymous"
+        finally:
+            if db is not None:
+                db.close()
     include_path = os.getenv("RATE_LIMIT_INCLUDE_PATH", "false").strip().lower() in {"1", "true", "yes", "on"}
     scope = request.url.path if include_path else None
     decision = rate_limiter.check(key, scope=scope)

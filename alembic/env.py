@@ -9,6 +9,7 @@ from alembic import context
 
 from app.database import Base
 from models.account import Account
+from models.audit_event import AuditEvent
 from models.users import User 
 from models.wallet import Wallet
 from models.ledger import Ledger

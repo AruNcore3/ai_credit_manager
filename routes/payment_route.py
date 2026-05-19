@@ -7,6 +7,7 @@ from app.auth import get_current_user
 from app.database import get_db
 from models.users import User
 from schemas.wallet_schema import TopUpIntentRequest, TopUpIntentResponse
+from services.audit_service import log_audit_event
 from services.payment_service import create_topup_intent
 
 router = APIRouter(prefix="/payments", tags=["payments"])
@@ -49,6 +50,17 @@ def topup_intent(
             str(exc),
         )
         raise HTTPException(status_code=400, detail=f"stripe error: {str(exc)}")
+    log_audit_event(
+        db,
+        actor_type="user",
+        actor_id=str(current_user.id),
+        account_id=current_user.account_id,
+        action="billing.topup_intent.create",
+        target_type="topup_attempt",
+        target_id=str(attempt.id),
+        metadata={"credits": body.credits, "amount_cents": amount_cents},
+    )
+    db.commit()
 
     return TopUpIntentResponse(
         attempt_id=attempt.id,
