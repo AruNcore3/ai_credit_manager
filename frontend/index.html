@@ -3,68 +3,113 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Billbridge Docs Home</title>
+  <title>Billbridge AI Docs</title>
   <style>
     :root {
-      --bg: #f6f8fa; --card: #fff; --text: #1f2328; --muted: #57606a;
-      --line: #d0d7de; --brand: #0969da; --brand-dark: #0550ae;
+      --bg: #f7f8fa;
+      --panel: #ffffff;
+      --line: #e4e7ec;
+      --text: #182230;
+      --muted: #5b6675;
+      --accent: #2563eb;
+      --assistant: #eef4ff;
+      --user: #f1f4f8;
     }
     * { box-sizing: border-box; }
     body { margin: 0; font-family: "Segoe UI", Arial, sans-serif; background: var(--bg); color: var(--text); }
-    .wrap { max-width: 1080px; margin: 0 auto; padding: 22px 16px 48px; }
-    .hero, .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
-    .hero { padding: 22px; }
+    .layout { max-width: 1200px; margin: 0 auto; min-height: 100vh; display: grid; grid-template-columns: 280px 1fr; gap: 14px; padding: 14px; }
+    .sidebar, .main { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
+    .sidebar { padding: 14px; }
+    .brand { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+    .hint { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+    .menu a {
+      display: block; text-decoration: none; color: #1f2937; font-size: 14px;
+      padding: 9px 10px; border-radius: 8px; margin-bottom: 6px; border: 1px solid transparent;
+    }
+    .menu a.active { background: #eef4ff; color: #1849a9; border-color: #d7e3ff; font-weight: 600; }
+    .menu a:hover { background: #f8fafc; }
+    .menu .small { font-size: 12px; color: var(--muted); padding-left: 10px; margin: 10px 0 6px; }
+    .main { padding: 16px; }
+    .chat { max-width: 860px; margin: 0 auto; }
+    .msg { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; }
+    .assistant { background: var(--assistant); }
+    .user { background: var(--user); }
+    .role { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #4b5563; margin-bottom: 6px; }
     h1 { margin: 0 0 8px; font-size: 30px; letter-spacing: -.01em; }
-    p { margin: 0; color: var(--muted); line-height: 1.5; }
-    .nav { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; }
-    .nav a { text-decoration: none; font-size: 13px; font-weight: 600; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; color: #24292f; background: #fff; }
-    .nav a.primary { background: var(--brand); border-color: var(--brand); color: #fff; }
-    .grid { margin-top: 14px; display: grid; grid-template-columns: 1fr; gap: 12px; }
-    .card { padding: 16px; }
-    .card h2 { margin: 0 0 6px; font-size: 18px; }
-    .card a { color: var(--brand-dark); font-weight: 600; text-decoration: none; font-size: 14px; }
-    footer { margin-top: 16px; font-size: 12px; color: var(--muted); text-align: center; }
-    @media (min-width: 920px) { .grid { grid-template-columns: 1fr 1fr; } }
+    p { margin: 0; line-height: 1.5; color: #243043; }
+    .prompts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+    .prompt {
+      display: block; text-decoration: none; color: #1f2937; background: #fff;
+      border: 1px solid var(--line); border-radius: 10px; padding: 12px;
+    }
+    .prompt strong { display: block; margin-bottom: 4px; font-size: 14px; }
+    .prompt span { font-size: 12px; color: var(--muted); }
+    .refs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .refs a {
+      text-decoration: none; font-size: 12px; font-weight: 600; color: #1849a9;
+      border: 1px solid #d7e3ff; background: #f5f8ff; border-radius: 999px; padding: 6px 10px;
+    }
+    @media (max-width: 940px) {
+      .layout { grid-template-columns: 1fr; }
+      .prompts { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <section class="hero">
-      <h1>Billbridge Developer Portal</h1>
-      <p>Everything needed to integrate quickly: onboarding, API keys, SDK usage, and production guidance.</p>
-      <div class="nav">
-        <a class="primary" href="/developer/quickstart">Quickstart</a>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">Billbridge Assistant Docs</div>
+      <div class="hint">LLM-style guide for API onboarding</div>
+      <nav class="menu">
+        <a class="active" href="/developer">Home</a>
+        <a href="/developer/quickstart">Quickstart</a>
         <a href="/developer/auth">Auth & API Keys</a>
-        <a href="/developer/sdk">SDK Guides</a>
-        <a href="/docs" target="_blank" rel="noreferrer">Swagger</a>
+        <a href="/developer/sdk">SDK</a>
+        <div class="small">Reference</div>
+        <a href="/docs" target="_blank" rel="noreferrer">Swagger UI</a>
         <a href="/reference" target="_blank" rel="noreferrer">ReDoc</a>
+        <a href="/openapi.json" target="_blank" rel="noreferrer">OpenAPI JSON</a>
+      </nav>
+    </aside>
+    <main class="main">
+      <div class="chat">
+        <div class="msg assistant">
+          <div class="role">Assistant</div>
+          <h1>Welcome to Billbridge Developer Portal</h1>
+          <p>I can help you integrate onboarding, API keys, usage billing, and SDK flows quickly. Choose a path below.</p>
+        </div>
+        <div class="msg user">
+          <div class="role">You</div>
+          <p>I want to get started and test my first API call.</p>
+        </div>
+        <div class="msg assistant">
+          <div class="role">Assistant</div>
+          <div class="prompts">
+            <a class="prompt" href="/developer/quickstart">
+              <strong>Get API Key</strong>
+              <span>Signup, get key, run balance in minutes.</span>
+            </a>
+            <a class="prompt" href="/developer/auth">
+              <strong>Auth Best Practices</strong>
+              <span>Header usage, rotation, and secure storage.</span>
+            </a>
+            <a class="prompt" href="/developer/sdk">
+              <strong>Use SDKs</strong>
+              <span>Python and Node setup with grouped methods.</span>
+            </a>
+            <a class="prompt" href="/reference" target="_blank" rel="noreferrer">
+              <strong>Full API Reference</strong>
+              <span>Dive into endpoint-level details.</span>
+            </a>
+          </div>
+          <div class="refs">
+            <a href="/docs" target="_blank" rel="noreferrer">Swagger</a>
+            <a href="/reference" target="_blank" rel="noreferrer">ReDoc</a>
+            <a href="/openapi.json" target="_blank" rel="noreferrer">OpenAPI</a>
+          </div>
+        </div>
       </div>
-    </section>
-
-    <section class="grid">
-      <article class="card">
-        <h2>Start in 2 minutes</h2>
-        <p>Create account, get your first key, and run a balance check.</p>
-        <p><a href="/developer/quickstart">Open Quickstart →</a></p>
-      </article>
-      <article class="card">
-        <h2>Authentication model</h2>
-        <p>Learn key headers, rotation flow, and secure storage practices.</p>
-        <p><a href="/developer/auth">Open Auth & Keys →</a></p>
-      </article>
-      <article class="card">
-        <h2>Python + Node SDKs</h2>
-        <p>Install and call grouped methods for usage, payments, and credits.</p>
-        <p><a href="/developer/sdk">Open SDK Guides →</a></p>
-      </article>
-      <article class="card">
-        <h2>Raw API reference</h2>
-        <p>Need full schema details? Use OpenAPI, Swagger, and ReDoc.</p>
-        <p><a href="/openapi.json" target="_blank" rel="noreferrer">Open OpenAPI JSON →</a></p>
-      </article>
-    </section>
-
-    <footer>Billbridge Developer Docs</footer>
+    </main>
   </div>
 </body>
 </html>

@@ -5,30 +5,41 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Billbridge SDK Guides</title>
   <style>
-    :root { --bg:#f6f8fa; --card:#fff; --text:#1f2328; --muted:#57606a; --line:#d0d7de; --brand:#0969da; --code:#0d1117; --codeText:#c9d1d9; }
-    body { margin:0; font-family:"Segoe UI",Arial,sans-serif; background:var(--bg); color:var(--text); }
-    .wrap { max-width:980px; margin:0 auto; padding:20px 16px 40px; }
-    .box { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; margin-bottom:12px; }
-    h1 { margin:0; font-size:26px; }
-    h2 { margin:0 0 8px; font-size:18px; }
-    p { color:var(--muted); }
-    .code { background:var(--code); color:var(--codeText); border:1px solid #30363d; border-radius:8px; padding:12px; position:relative; }
-    pre { margin:0; white-space:pre-wrap; font-size:13px; }
-    .copy { position:absolute; top:8px; right:8px; font-size:12px; padding:4px 8px; border-radius:7px; border:1px solid #30363d; background:#161b22; color:#c9d1d9; cursor:pointer; }
-    a { text-decoration:none; color:var(--brand); font-weight:600; }
+    :root { --bg:#f7f8fa; --panel:#fff; --line:#e4e7ec; --text:#182230; --muted:#5b6675; --assistant:#eef4ff; --user:#f1f4f8; --code:#0d1117; --codeText:#c9d1d9; }
+    * { box-sizing: border-box; } body { margin:0; font-family:"Segoe UI",Arial,sans-serif; background:var(--bg); color:var(--text); }
+    .layout { max-width:1200px; margin:0 auto; min-height:100vh; display:grid; grid-template-columns:280px 1fr; gap:14px; padding:14px; }
+    .sidebar,.main { background:var(--panel); border:1px solid var(--line); border-radius:12px; }
+    .sidebar { padding:14px; } .brand{font-size:15px;font-weight:700;margin-bottom:10px;} .hint{font-size:12px;color:var(--muted);margin-bottom:12px;}
+    .menu a{display:block;text-decoration:none;color:#1f2937;font-size:14px;padding:9px 10px;border-radius:8px;margin-bottom:6px;border:1px solid transparent;}
+    .menu a.active{background:#eef4ff;color:#1849a9;border-color:#d7e3ff;font-weight:600;} .menu a:hover{background:#f8fafc;}
+    .main{padding:16px;} .chat{max-width:860px;margin:0 auto;}
+    .msg{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;} .assistant{background:var(--assistant);} .user{background:var(--user);}
+    .role{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#4b5563;margin-bottom:6px;}
+    h1{margin:0 0 8px;font-size:28px;} p{margin:0;color:#243043;line-height:1.5;}
+    .code{margin-top:8px;background:var(--code);color:var(--codeText);border:1px solid #30363d;border-radius:8px;padding:12px;position:relative;}
+    pre{margin:0;white-space:pre-wrap;font-size:13px;} .copy{position:absolute;top:8px;right:8px;font-size:12px;padding:4px 8px;border-radius:7px;border:1px solid #30363d;background:#161b22;color:#c9d1d9;cursor:pointer;}
+    @media (max-width:940px){.layout{grid-template-columns:1fr;}}
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <section class="box">
-      <h1>SDK Guides</h1>
-      <p>Install and call Billbridge from Python or Node.</p>
-      <a href="/developer">← Back to docs home</a>
-    </section>
-    <section class="box">
-      <h2>Python + Node setup</h2>
-      <div class="code"><button class="copy" data-copy="sdkCmd">Copy</button><pre id="sdkCmd"></pre></div>
-    </section>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">Billbridge Assistant Docs</div>
+      <div class="hint">SDK install and usage</div>
+      <nav class="menu">
+        <a href="/developer">Home</a>
+        <a href="/developer/quickstart">Quickstart</a>
+        <a href="/developer/auth">Auth & API Keys</a>
+        <a class="active" href="/developer/sdk">SDK</a>
+      </nav>
+    </aside>
+    <main class="main">
+      <div class="chat">
+        <div class="msg assistant"><div class="role">Assistant</div><h1>SDK Guides</h1><p>Install and integrate with Python and Node clients.</p></div>
+        <div class="msg user"><div class="role">You</div><p>Show me the exact SDK commands and example usage.</p></div>
+        <div class="msg assistant"><div class="role">Assistant</div><div class="code"><button class="copy" data-copy="sdkCmd">Copy</button><pre id="sdkCmd"></pre></div></div>
+      </div>
+    </main>
   </div>
   <script src="/developer-assets/app.js"></script>
 </body>

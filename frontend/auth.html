@@ -5,46 +5,43 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Billbridge Auth & API Keys</title>
   <style>
-    :root { --bg:#f6f8fa; --card:#fff; --text:#1f2328; --muted:#57606a; --line:#d0d7de; --brand:#0969da; }
-    body { margin:0; font-family:"Segoe UI",Arial,sans-serif; background:var(--bg); color:var(--text); }
-    .wrap { max-width:960px; margin:0 auto; padding:20px 16px 40px; }
-    .box { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; margin-bottom:12px; }
-    h1 { margin:0; font-size:26px; }
-    h2 { margin:0 0 8px; font-size:18px; }
-    p, li { color:var(--muted); line-height:1.5; }
-    a { text-decoration:none; color:var(--brand); font-weight:600; }
-    code { background:#f3f4f6; border:1px solid #e5e7eb; border-radius:6px; padding:1px 5px; }
+    :root { --bg:#f7f8fa; --panel:#fff; --line:#e4e7ec; --text:#182230; --muted:#5b6675; --assistant:#eef4ff; --user:#f1f4f8; }
+    * { box-sizing: border-box; } body { margin:0; font-family:"Segoe UI",Arial,sans-serif; background:var(--bg); color:var(--text); }
+    .layout { max-width:1200px; margin:0 auto; min-height:100vh; display:grid; grid-template-columns:280px 1fr; gap:14px; padding:14px; }
+    .sidebar,.main { background:var(--panel); border:1px solid var(--line); border-radius:12px; }
+    .sidebar { padding:14px; } .brand{font-size:15px;font-weight:700;margin-bottom:10px;} .hint{font-size:12px;color:var(--muted);margin-bottom:12px;}
+    .menu a{display:block;text-decoration:none;color:#1f2937;font-size:14px;padding:9px 10px;border-radius:8px;margin-bottom:6px;border:1px solid transparent;}
+    .menu a.active{background:#eef4ff;color:#1849a9;border-color:#d7e3ff;font-weight:600;} .menu a:hover{background:#f8fafc;}
+    .main{padding:16px;} .chat{max-width:860px;margin:0 auto;}
+    .msg{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;} .assistant{background:var(--assistant);} .user{background:var(--user);}
+    .role{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#4b5563;margin-bottom:6px;}
+    h1{margin:0 0 8px;font-size:28px;} h2{margin:0 0 6px;font-size:18px;} p,li{margin:0;color:#243043;line-height:1.5;}
+    ul{margin:0;padding-left:18px;} li{margin-bottom:6px;}
+    code{background:#f3f4f6;border:1px solid #e5e7eb;border-radius:6px;padding:1px 5px;font-size:12px;}
+    @media (max-width:940px){.layout{grid-template-columns:1fr;}}
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <section class="box">
-      <h1>Auth & API Key Guide</h1>
-      <p>How to authenticate requests and manage keys safely.</p>
-      <a href="/developer">← Back to docs home</a>
-    </section>
-    <section class="box">
-      <h2>Header</h2>
-      <p>Send your key in <code>X-API-Key</code> for all <code>/v1</code> endpoints.</p>
-    </section>
-    <section class="box">
-      <h2>Key Lifecycle</h2>
-      <ul>
-        <li>Create key: <code>POST /v1/api-keys</code></li>
-        <li>List keys: <code>GET /v1/api-keys</code></li>
-        <li>Rotate key: <code>POST /v1/api-keys/{key_id}/rotate</code></li>
-        <li>Revoke key: <code>POST /v1/api-keys/{key_id}/revoke</code></li>
-      </ul>
-    </section>
-    <section class="box">
-      <h2>Security Practices</h2>
-      <ul>
-        <li>Keep keys in environment variables.</li>
-        <li>Never commit keys to source control.</li>
-        <li>Rotate keys every 90 days or immediately after exposure.</li>
-        <li>Deploy new key first, then revoke the old one.</li>
-      </ul>
-    </section>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">Billbridge Assistant Docs</div>
+      <div class="hint">Authentication and key policy</div>
+      <nav class="menu">
+        <a href="/developer">Home</a>
+        <a href="/developer/quickstart">Quickstart</a>
+        <a class="active" href="/developer/auth">Auth & API Keys</a>
+        <a href="/developer/sdk">SDK</a>
+      </nav>
+    </aside>
+    <main class="main">
+      <div class="chat">
+        <div class="msg assistant"><div class="role">Assistant</div><h1>Auth & API Key Guide</h1><p>Everything you need to authenticate and safely manage keys.</p></div>
+        <div class="msg user"><div class="role">You</div><p>How should I send and rotate API keys in production?</p></div>
+        <div class="msg assistant"><div class="role">Assistant</div><h2>Header</h2><p>Send key in <code>X-API-Key</code> for all <code>/v1</code> routes.</p></div>
+        <div class="msg assistant"><div class="role">Assistant</div><h2>Key lifecycle</h2><ul><li>Create: <code>POST /v1/api-keys</code></li><li>List: <code>GET /v1/api-keys</code></li><li>Rotate: <code>POST /v1/api-keys/{key_id}/rotate</code></li><li>Revoke: <code>POST /v1/api-keys/{key_id}/revoke</code></li></ul></div>
+        <div class="msg assistant"><div class="role">Assistant</div><h2>Security practices</h2><ul><li>Store keys in env vars/secret managers.</li><li>Never commit keys.</li><li>Rotate every 90 days or on exposure.</li><li>Deploy new key before revoking old key.</li></ul></div>
+      </div>
+    </main>
   </div>
 </body>
 </html>
