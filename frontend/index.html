@@ -6,49 +6,65 @@
   <title>Billbridge AI Docs</title>
   <style>
     :root {
-      --bg: #f7f8fa;
-      --panel: #ffffff;
-      --line: #e4e7ec;
-      --text: #182230;
-      --muted: #5b6675;
-      --accent: #2563eb;
-      --assistant: #eef4ff;
-      --user: #f1f4f8;
+      --bg: #0a0712;
+      --panel: #130f1f;
+      --line: #2b2140;
+      --text: #efeaff;
+      --muted: #b8acd8;
+      --accent: #9b5cff;
+      --assistant: #1a1330;
+      --user: #171127;
     }
     * { box-sizing: border-box; }
     body { margin: 0; font-family: "Segoe UI", Arial, sans-serif; background: var(--bg); color: var(--text); }
     .layout { max-width: 1200px; margin: 0 auto; min-height: 100vh; display: grid; grid-template-columns: 280px 1fr; gap: 14px; padding: 14px; }
-    .sidebar, .main { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
+    .sidebar, .main {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      animation: fadeIn .4s ease both;
+    }
     .sidebar { padding: 14px; }
     .brand { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
     .hint { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
     .menu a {
-      display: block; text-decoration: none; color: #1f2937; font-size: 14px;
+      display: block; text-decoration: none; color: #ddd4ff; font-size: 14px;
       padding: 9px 10px; border-radius: 8px; margin-bottom: 6px; border: 1px solid transparent;
+      transition: all .2s ease;
     }
-    .menu a.active { background: #eef4ff; color: #1849a9; border-color: #d7e3ff; font-weight: 600; }
-    .menu a:hover { background: #f8fafc; }
+    .menu a.active { background: #24173e; color: #caa7ff; border-color: #47306e; font-weight: 600; }
+    .menu a:hover { background: #1e1534; transform: translateX(2px); }
     .menu .small { font-size: 12px; color: var(--muted); padding-left: 10px; margin: 10px 0 6px; }
     .main { padding: 16px; }
     .chat { max-width: 860px; margin: 0 auto; }
-    .msg { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; }
+    .msg {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      animation: floatUp .35s ease both;
+    }
     .assistant { background: var(--assistant); }
     .user { background: var(--user); }
-    .role { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #4b5563; margin-bottom: 6px; }
+    .role { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #b79ce9; margin-bottom: 6px; }
     h1 { margin: 0 0 8px; font-size: 30px; letter-spacing: -.01em; }
-    p { margin: 0; line-height: 1.5; color: #243043; }
+    p { margin: 0; line-height: 1.5; color: #dfd3ff; }
     .prompts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
     .prompt {
-      display: block; text-decoration: none; color: #1f2937; background: #fff;
+      display: block; text-decoration: none; color: #ece3ff; background: #1a1330;
       border: 1px solid var(--line); border-radius: 10px; padding: 12px;
+      transition: transform .2s ease, border-color .2s ease;
     }
+    .prompt:hover { transform: translateY(-2px); border-color: #7c4de0; }
     .prompt strong { display: block; margin-bottom: 4px; font-size: 14px; }
     .prompt span { font-size: 12px; color: var(--muted); }
     .refs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
     .refs a {
-      text-decoration: none; font-size: 12px; font-weight: 600; color: #1849a9;
-      border: 1px solid #d7e3ff; background: #f5f8ff; border-radius: 999px; padding: 6px 10px;
+      text-decoration: none; font-size: 12px; font-weight: 600; color: #d7b9ff;
+      border: 1px solid #4b2f79; background: #20153b; border-radius: 999px; padding: 6px 10px;
     }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes floatUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
     @media (max-width: 940px) {
       .layout { grid-template-columns: 1fr; }
       .prompts { grid-template-columns: 1fr; }
