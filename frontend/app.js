@@ -2,18 +2,30 @@ const BASE_URL = "https://api.billbridge.in/v1";
 
 const snippets = {
   signupCmd: [
-    `# PowerShell`,
-    `Invoke-RestMethod -Method POST -Uri "${BASE_URL}/onboarding/signup" -ContentType "application/json" -Body '{"account_name":"acme","username":"owner","email":"owner@acme.com","password":"replace-me-123"}'`,
+    `curl -X POST ${BASE_URL}/onboarding/signup \\`,
+    `  -H "Content-Type: application/json" \\`,
+    `  -d '{"account_name":"acme","username":"owner","email":"owner@acme.com","password":"replace-me-123"}'`,
   ].join("\n"),
   balanceCmd: [
-    `Invoke-RestMethod -Method GET -Uri "${BASE_URL}/credits/balance" -Headers @{ "X-API-Key" = "<your_api_key>" }`,
+    `curl -X GET ${BASE_URL}/credits/balance \\`,
+    `  -H "X-API-Key: YOUR_API_KEY"`,
   ].join("\n"),
   usageCmd: [
-    `Invoke-RestMethod -Method POST -Uri "${BASE_URL}/usage/record" -Headers @{ "X-API-Key" = "<your_api_key>" } -ContentType "application/json" -Body '{"event_id":"evt_001","model":"gpt-4.1","input_token":1200,"output_token":600}'`,
+    `curl -X POST ${BASE_URL}/usage/record \\`,
+    `  -H "X-API-Key: YOUR_API_KEY" \\`,
+    `  -H "Content-Type: application/json" \\`,
+    `  -d '{"event_id":"evt_001","model":"gpt-4.1","input_token":1200,"output_token":600}'`,
     ``,
-    `Invoke-RestMethod -Method POST -Uri "${BASE_URL}/payments/topup-intent" -Headers @{ "X-API-Key" = "<your_api_key>"; "Idempotency-Key" = "<uuid>" } -ContentType "application/json" -Body '{"credits":5000}'`,
+    `curl -X POST ${BASE_URL}/payments/topup-intent \\`,
+    `  -H "X-API-Key: YOUR_API_KEY" \\`,
+    `  -H "Idempotency-Key: your-idempotency-key" \\`,
+    `  -H "Content-Type: application/json" \\`,
+    `  -d '{"credits":5000}'`,
     ``,
-    `Invoke-RestMethod -Method POST -Uri "${BASE_URL}/api-keys" -Headers @{ "X-API-Key" = "<your_api_key>" } -ContentType "application/json" -Body '{"name":"prod-key"}'`,
+    `curl -X POST ${BASE_URL}/api-keys \\`,
+    `  -H "X-API-Key: YOUR_API_KEY" \\`,
+    `  -H "Content-Type: application/json" \\`,
+    `  -d '{"name":"prod-key"}'`,
   ].join("\n"),
   sdkCmd: [
     `# Python`,

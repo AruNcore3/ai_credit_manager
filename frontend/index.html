@@ -111,14 +111,48 @@
         <div class="msg assistant">
           <div class="role">Assistant</div>
           <h1>Welcome to Billbridge Developer Portal</h1>
-          <p>I can help you integrate onboarding, API keys, usage billing, and SDK flows quickly. Choose a path below.</p>
+          <p>
+            Billbridge is mid-cycle billing infrastructure for AI SaaS products.
+            It helps you integrate credit wallets, usage metering, top-up payments,
+            ledger tracking, webhook handling, and API key management through one API.
+          </p>
         </div>
         <div class="msg user">
           <div class="role">You</div>
-          <p>I want to get started and test my first API call.</p>
+          <p>What problem does Billbridge solve for my product?</p>
         </div>
         <div class="msg assistant">
           <div class="role">Assistant</div>
+          <p>
+            Instead of building payment tracking, idempotency, credit deduction logic,
+            webhook reconciliation, and API key lifecycle from scratch, Billbridge gives
+            you production-ready endpoints you can plug into your backend.
+          </p>
+          <div class="prompts">
+            <div class="prompt">
+              <strong>Best for AI tools</strong>
+              <span>LLM apps, API SaaS, and credit-based software products.</span>
+            </div>
+            <div class="prompt">
+              <strong>Usage-based billing</strong>
+              <span>Track input/output tokens and deduct credits per usage event.</span>
+            </div>
+          </div>
+        </div>
+        <div class="msg user">
+          <div class="role">You</div>
+          <p>How does the complete flow work?</p>
+        </div>
+        <div class="msg assistant">
+          <div class="role">Assistant</div>
+          <p><strong>How Billbridge Works</strong></p>
+          <div class="prompts">
+            <div class="prompt"><strong>1) Signup</strong><span>Customer signup creates account and API key.</span></div>
+            <div class="prompt"><strong>2) Top-up</strong><span>Create top-up payment intent before cycle end.</span></div>
+            <div class="prompt"><strong>3) Webhook confirm</strong><span>Stripe webhook marks payment success and applies credits.</span></div>
+            <div class="prompt"><strong>4) Usage deduction</strong><span>Record usage events and deduct wallet credits.</span></div>
+          </div>
+          <p style="margin-top:10px;"><strong>Core Features</strong></p>
           <div class="prompts">
             <a class="prompt" href="/developer/quickstart">
               <strong>Get API Key</strong>
@@ -137,6 +171,10 @@
               <span>Dive into endpoint-level details.</span>
             </a>
           </div>
+          <p style="margin-top:10px;">
+            Why Billbridge? Building billing infrastructure is painful. Billbridge gives
+            you developer-friendly APIs so you can focus on your SaaS product.
+          </p>
           <div class="refs">
             <a href="/docs" target="_blank" rel="noreferrer">Swagger</a>
             <a href="/reference" target="_blank" rel="noreferrer">ReDoc</a>

@@ -43,9 +43,26 @@
       <div class="chat">
         <div class="msg assistant"><div class="role">Assistant</div><h1>Quickstart</h1><p>Let’s create your tenant and run first calls.</p></div>
         <div class="msg user"><div class="role">You</div><p>Give me the exact commands.</p></div>
-        <div class="msg assistant"><div class="role">Assistant</div><p>1) Signup and get first API key</p><div class="code"><button class="copy" data-copy="signupCmd">Copy</button><pre id="signupCmd"></pre></div></div>
-        <div class="msg assistant"><div class="role">Assistant</div><p>2) Check current balance</p><div class="code"><button class="copy" data-copy="balanceCmd">Copy</button><pre id="balanceCmd"></pre></div></div>
-        <div class="msg assistant"><div class="role">Assistant</div><p>3) Record usage and create a named production key</p><div class="code"><button class="copy" data-copy="usageCmd">Copy</button><pre id="usageCmd"></pre></div></div>
+        <div class="msg assistant"><div class="role">Assistant</div><p>1) Signup and get first API key</p><div class="code"><button class="copy" data-copy="signupCmd">Copy</button><pre id="signupCmd">curl -X POST https://api.billbridge.in/v1/onboarding/signup \
+  -H "Content-Type: application/json" \
+  -d '{"account_name":"acme","username":"owner","email":"owner@acme.com","password":"replace-me-123"}'</pre></div></div>
+        <div class="msg assistant"><div class="role">Assistant</div><p>2) Check current balance</p><div class="code"><button class="copy" data-copy="balanceCmd">Copy</button><pre id="balanceCmd">curl -X GET https://api.billbridge.in/v1/credits/balance \
+  -H "X-API-Key: YOUR_API_KEY"</pre></div></div>
+        <div class="msg assistant"><div class="role">Assistant</div><p>3) Record usage + top-up + create key</p><div class="code"><button class="copy" data-copy="usageCmd">Copy</button><pre id="usageCmd">POST /v1/usage/record
+POST /v1/payments/topup-intent
+POST /v1/api-keys</pre></div></div>
+        <div class="msg user"><div class="role">You</div><p>Show me the full example flow.</p></div>
+        <div class="msg assistant">
+          <div class="role">Assistant</div>
+          <p>Example Integration Flow</p>
+          <div class="code">
+            <pre>POST /v1/onboarding/signup
+GET /v1/credits/balance
+POST /v1/usage/record
+POST /v1/payments/topup-intent
+GET /v1/credits/ledger</pre>
+          </div>
+        </div>
       </div>
     </main>
   </div>
