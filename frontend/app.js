@@ -27,6 +27,23 @@ const snippets = {
     `  -H "Content-Type: application/json" \\`,
     `  -d '{"name":"prod-key"}'`,
   ].join("\n"),
+  topupCmd: [
+    `curl -X POST ${BASE_URL}/payments/topup-intent \\`,
+    `  -H "X-API-Key: YOUR_API_KEY" \\`,
+    `  -H "Idempotency-Key: your-idempotency-key" \\`,
+    `  -H "Content-Type: application/json" \\`,
+    `  -d '{"credits":5000}'`,
+  ].join("\n"),
+  webhookNote: [
+    `Webhook endpoint:`,
+    `POST /v1/webhooks/stripe`,
+    ``,
+    `Stripe event:`,
+    `payment_intent.succeeded`,
+    ``,
+    `Result:`,
+    `Credits applied idempotently to customer wallet.`,
+  ].join("\n"),
   sdkCmd: [
     `# Python`,
     `pip install billbridge-ai-credit-sdk`,

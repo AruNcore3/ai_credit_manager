@@ -81,7 +81,7 @@ def developer_docs():
 
 @app.get("/developer/{page}", include_in_schema=False)
 def developer_page(page: str):
-    allowed_pages = {"quickstart", "auth", "sdk"}
+    allowed_pages = {"quickstart", "auth", "sdk", "flow"}
     if page not in allowed_pages:
         return JSONResponse(status_code=404, content={"detail": "page not found"})
     target = frontend_dir / f"{page}.html"
