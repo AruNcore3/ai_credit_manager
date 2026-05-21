@@ -21,6 +21,8 @@
     .code{margin-top:8px;background:var(--code);color:var(--codeText);border:1px solid #30363d;border-radius:8px;padding:12px;position:relative;}
     pre{margin:0;white-space:pre-wrap;font-size:13px;} .copy{position:absolute;top:8px;right:8px;font-size:12px;padding:4px 8px;border-radius:7px;border:1px solid #cfbbff;background:#f3ecff;color:#6a3dd9;cursor:pointer;transition:all .2s ease;}
     .copy:hover{transform:translateY(-1px);background:#eadfff;}
+    .steps{margin-top:8px;padding-left:18px;color:#3f2f69;}
+    .steps li{margin-bottom:6px;}
     @keyframes fadeIn{from{opacity:0}to{opacity:1}}
     @keyframes floatUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
     @media (max-width:940px){.layout{grid-template-columns:1fr;}}
@@ -44,6 +46,68 @@
         <div class="msg assistant"><div class="role">Assistant</div><h1>SDK Guides</h1><p>Install and integrate with Python and Node clients.</p></div>
         <div class="msg user"><div class="role">You</div><p>Show me the exact SDK commands and example usage.</p></div>
         <div class="msg assistant"><div class="role">Assistant</div><div class="code"><button class="copy" data-copy="sdkCmd">Copy</button><pre id="sdkCmd"></pre></div></div>
+        <div class="msg user"><div class="role">You</div><p>How do I download and integrate Billbridge into my SaaS backend?</p></div>
+        <div class="msg assistant">
+          <div class="role">Assistant</div>
+          <p><strong>Hosted integration tutorial</strong></p>
+          <ol class="steps">
+            <li>Create a Billbridge tenant using <code>POST /v1/onboarding/signup</code> and store returned <code>api_key</code>.</li>
+            <li>Add env vars in your backend service: <code>AI_CREDIT_API_KEY</code> and <code>AI_CREDIT_BASE_URL=https://api.billbridge.in/v1</code>.</li>
+            <li>Call Billbridge from your product APIs: check balance before usage-heavy actions, then record usage after completion.</li>
+            <li>Create top-up intents when users run low and confirm credits via Stripe webhooks.</li>
+          </ol>
+          <div class="code">
+            <pre># Node (Express) example
+import { AICreditClient } from "billbridge-ai-credit-sdk";
+const billbridge = new AICreditClient({
+  apiKey: process.env.AI_CREDIT_API_KEY,
+  baseUrl: "https://api.billbridge.in/v1",
+});
+
+app.post("/run-model", async (req, res) => {
+  const balance = await billbridge.credits.balance();
+  if (balance.balance &lt; 10) return res.status(402).json({ error: "low credits" });
+
+  // run your LLM call here...
+  const result = { ok: true };
+
+  await billbridge.usage.record({
+    event_id: `evt_${Date.now()}`,
+    model: "gpt-4.1",
+    input_token: 1200,
+    output_token: 400,
+  });
+  res.json(result);
+});</pre>
+          </div>
+          <div class="code">
+            <pre># Python (FastAPI) example
+from fastapi import FastAPI, HTTPException
+from ai_credit_sdk.client import AICreditClient
+import time
+
+app = FastAPI()
+billbridge = AICreditClient(
+    api_key="YOUR_API_KEY",
+    base_url="https://api.billbridge.in/v1",
+)
+
+@app.post("/run-model")
+def run_model():
+    bal = billbridge.credits.balance()
+    if bal["balance"] &lt; 10:
+        raise HTTPException(status_code=402, detail="low credits")
+
+    # run your LLM call here...
+    billbridge.usage.record({
+        "event_id": f"evt_{int(time.time())}",
+        "model": "gpt-4.1",
+        "input_token": 1000,
+        "output_token": 500,
+    })
+    return {"ok": True}</pre>
+          </div>
+        </div>
       </div>
     </main>
   </div>

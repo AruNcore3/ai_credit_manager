@@ -21,6 +21,8 @@
     .code{margin-top:8px;background:var(--code);color:var(--codeText);border:1px solid #30363d;border-radius:8px;padding:12px;position:relative;}
     pre{margin:0;white-space:pre-wrap;font-size:13px;} .copy{position:absolute;top:8px;right:8px;font-size:12px;padding:4px 8px;border-radius:7px;border:1px solid #cfbbff;background:#f3ecff;color:#6a3dd9;cursor:pointer;transition:all .2s ease;}
     .copy:hover{transform:translateY(-1px);background:#eadfff;}
+    .steps{margin-top:8px;padding-left:18px;color:#3f2f69;}
+    .steps li{margin-bottom:6px;}
     @keyframes fadeIn{from{opacity:0}to{opacity:1}}
     @keyframes floatUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
     @media (max-width:940px){.layout{grid-template-columns:1fr;}}
@@ -61,6 +63,32 @@ GET /v1/credits/balance
 POST /v1/usage/record
 POST /v1/payments/topup-intent
 GET /v1/credits/ledger</pre>
+          </div>
+        </div>
+        <div class="msg user"><div class="role">You</div><p>Can I run Billbridge myself and integrate it?</p></div>
+        <div class="msg assistant">
+          <div class="role">Assistant</div>
+          <p><strong>Self-host tutorial (download + run)</strong></p>
+          <ol class="steps">
+            <li>Clone repository from GitHub and configure environment variables.</li>
+            <li>Set up PostgreSQL + Redis (local Docker or managed instances).</li>
+            <li>Run migrations and start API server.</li>
+            <li>Point your SaaS backend to your Billbridge base URL.</li>
+          </ol>
+          <div class="code">
+            <pre>git clone https://github.com/AruNcore3/ai_credit_manager.git
+cd ai_credit_manager
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+alembic upgrade head
+python -m uvicorn app.main:app --host 0.0.0.0 --port 8000</pre>
+          </div>
+          <div class="code">
+            <pre># then call your self-hosted API
+curl -X POST http://localhost:8000/v1/onboarding/signup \
+  -H "Content-Type: application/json" \
+  -d '{"account_name":"acme","username":"owner","email":"owner@acme.com","password":"replace-me-123"}'</pre>
           </div>
         </div>
       </div>
