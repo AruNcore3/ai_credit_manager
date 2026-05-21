@@ -65,30 +65,33 @@ POST /v1/payments/topup-intent
 GET /v1/credits/ledger</pre>
           </div>
         </div>
-        <div class="msg user"><div class="role">You</div><p>Can I run Billbridge myself and integrate it?</p></div>
+        <div class="msg user"><div class="role">You</div><p>How do I install and integrate Billbridge in my app quickly?</p></div>
         <div class="msg assistant">
           <div class="role">Assistant</div>
-          <p><strong>Self-host tutorial (download + run)</strong></p>
+          <p><strong>Simple install tutorial (like numpy)</strong></p>
           <ol class="steps">
-            <li>Clone repository from GitHub and configure environment variables.</li>
-            <li>Set up PostgreSQL + Redis (local Docker or managed instances).</li>
-            <li>Run migrations and start API server.</li>
-            <li>Point your SaaS backend to your Billbridge base URL.</li>
+            <li>Install SDK package in your backend.</li>
+            <li>Store your Billbridge API key in env var.</li>
+            <li>Call balance/usage/top-up endpoints from your app flow.</li>
+            <li>Use webhook + ledger endpoints for reliable billing state.</li>
           </ol>
           <div class="code">
-            <pre>git clone https://github.com/AruNcore3/ai_credit_manager.git
-cd ai_credit_manager
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-alembic upgrade head
-python -m uvicorn app.main:app --host 0.0.0.0 --port 8000</pre>
+            <pre># Python backend
+pip install billbridge-ai-credit-sdk
+
+# Node backend
+npm install billbridge-ai-credit-sdk</pre>
           </div>
           <div class="code">
-            <pre># then call your self-hosted API
-curl -X POST http://localhost:8000/v1/onboarding/signup \
-  -H "Content-Type: application/json" \
-  -d '{"account_name":"acme","username":"owner","email":"owner@acme.com","password":"replace-me-123"}'</pre>
+            <pre># backend env vars
+AI_CREDIT_API_KEY=your_billbridge_key
+AI_CREDIT_BASE_URL=https://api.billbridge.in/v1</pre>
+          </div>
+          <div class="code">
+            <pre># minimal Python usage
+from ai_credit_sdk.client import AICreditClient
+client = AICreditClient(api_key="YOUR_API_KEY", base_url="https://api.billbridge.in/v1")
+print(client.credits.balance())</pre>
           </div>
         </div>
       </div>
