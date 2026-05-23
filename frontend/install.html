@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Billbridge Flow Tutorial</title>
+  <title>Billbridge Install Guide</title>
   <style>
     :root { --bg:#f8f6ff; --panel:#ffffff; --line:#e5dbff; --text:#24133f; --muted:#6b5a96; --assistant:#f4efff; --user:#fbf9ff; --code:#2a1848; --codeText:#f3ecff; }
     * { box-sizing: border-box; } body { margin:0; font-family:"Segoe UI",Arial,sans-serif; background:var(--bg); color:var(--text); }
@@ -17,7 +17,8 @@
     .main{padding:16px;} .chat{max-width:900px;margin:0 auto;}
     .msg{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;animation:floatUp .35s ease both;} .assistant{background:var(--assistant);} .user{background:var(--user);}
     .role{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#7a5ec2;margin-bottom:6px;}
-    h1{margin:0 0 8px;font-size:28px;} h2{margin:0 0 8px;font-size:18px;} p{margin:0;color:#3f2f69;line-height:1.5;}
+    h1{margin:0 0 8px;font-size:28px;} p{margin:0;color:#3f2f69;line-height:1.5;}
+    .steps{margin:8px 0 0;padding-left:18px;color:#3f2f69;} .steps li{margin-bottom:6px;}
     .code{margin-top:8px;background:var(--code);color:var(--codeText);border:1px solid #30363d;border-radius:8px;padding:12px;position:relative;}
     pre{margin:0;white-space:pre-wrap;font-size:13px;} .copy{position:absolute;top:8px;right:8px;font-size:12px;padding:4px 8px;border-radius:7px;border:1px solid #cfbbff;background:#f3ecff;color:#6a3dd9;cursor:pointer;transition:all .2s ease;}
     .copy:hover{transform:translateY(-1px);background:#eadfff;}
@@ -30,12 +31,12 @@
   <div class="layout">
     <aside class="sidebar">
       <div class="brand">Billbridge Assistant Docs</div>
-      <div class="hint">Signup → Top-up → Usage → Webhook</div>
+      <div class="hint">Install and import in minutes</div>
       <nav class="menu">
         <a href="/developer">Home</a>
-        <a href="/developer/install">Install Guide</a>
+        <a class="active" href="/developer/install">Install Guide</a>
         <a href="/developer/quickstart">Quickstart</a>
-        <a class="active" href="/developer/flow">Flow Tutorial</a>
+        <a href="/developer/flow">Flow Tutorial</a>
         <a href="/developer/auth">Auth & API Keys</a>
         <a href="/developer/sdk">SDK</a>
       </nav>
@@ -43,31 +44,40 @@
     </aside>
     <main class="main">
       <div class="chat">
-        <div class="msg assistant"><div class="role">Assistant</div><h1>Billing Flow Tutorial</h1><p>This shows exactly how signup, top-up, usage, and webhook confirmation work together.</p></div>
-        <div class="msg user"><div class="role">You</div><p>Step 1: How do I create customer + key?</p></div>
-        <div class="msg assistant"><div class="role">Assistant</div><h2>1) Signup</h2><p>Create tenant account and first API key.</p><div class="code"><button class="copy" data-copy="signupCmd">Copy</button><pre id="signupCmd">curl -X POST https://api.billbridge.in/v1/onboarding/signup \
-  -H "Content-Type: application/json" \
-  -d '{"account_name":"acme","username":"owner","email":"owner@acme.com","password":"replace-me-123"}'</pre></div></div>
-        <div class="msg user"><div class="role">You</div><p>Step 2: How customer adds credits?</p></div>
-        <div class="msg assistant"><div class="role">Assistant</div><h2>2) Top-up</h2><p>Create Stripe payment intent for credit purchase.</p><div class="code"><button class="copy" data-copy="topupCmd">Copy</button><pre id="topupCmd">curl -X POST https://api.billbridge.in/v1/payments/topup-intent \
-  -H "X-API-Key: YOUR_API_KEY" \
-  -H "Idempotency-Key: your-idempotency-key" \
-  -H "Content-Type: application/json" \
-  -d '{"credits":5000}'</pre></div></div>
-        <div class="msg user"><div class="role">You</div><p>Step 3: How usage deduction happens?</p></div>
-        <div class="msg assistant"><div class="role">Assistant</div><h2>3) Usage Record</h2><p>Record each LLM/API usage event and deduct credits.</p><div class="code"><button class="copy" data-copy="usageCmd">Copy</button><pre id="usageCmd">curl -X POST https://api.billbridge.in/v1/usage/record \
-  -H "X-API-Key: YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"event_id":"evt_001","model":"gpt-4.1","input_token":1200,"output_token":600}'</pre></div></div>
-        <div class="msg user"><div class="role">You</div><p>Step 4: How payment gets confirmed?</p></div>
-        <div class="msg assistant"><div class="role">Assistant</div><h2>4) Webhook Confirm</h2><p>Stripe sends payment success webhook. Billbridge verifies signature and applies credits once.</p><div class="code"><button class="copy" data-copy="webhookNote">Copy</button><pre id="webhookNote">Webhook endpoint:
-POST /v1/webhooks/stripe
+        <div class="msg assistant"><div class="role">Assistant</div><h1>Install Billbridge SDK</h1><p>Use it exactly like a normal package install on your machine, then import and call API methods.</p></div>
+        <div class="msg user"><div class="role">You</div><p>Show me step-by-step setup from zero.</p></div>
+        <div class="msg assistant">
+          <div class="role">Assistant</div>
+          <ol class="steps">
+            <li>Install Python 3.10+ if it is not already installed.</li>
+            <li>Install the SDK from PyPI.</li>
+            <li>Import client and set your API key.</li>
+            <li>Call your first endpoint (credits balance).</li>
+          </ol>
+          <div class="code"><button class="copy" data-copy="installCmd">Copy</button><pre id="installCmd">pip install billbridge-ai-credit-sdk</pre></div>
+          <div class="code"><button class="copy" data-copy="importCmd">Copy</button><pre id="importCmd">from ai_credit_sdk.client import AICreditClient
 
-Stripe event:
-payment_intent.succeeded
+client = AICreditClient(
+    api_key="YOUR_API_KEY",
+    base_url="https://api.billbridge.in/v1",
+)
 
-Result:
-Credits applied idempotently to customer wallet.</pre></div></div>
+print(client.credits.balance())</pre></div>
+        </div>
+        <div class="msg user"><div class="role">You</div><p>How do I use env vars instead of hardcoding keys?</p></div>
+        <div class="msg assistant">
+          <div class="role">Assistant</div>
+          <div class="code"><button class="copy" data-copy="envCmd">Copy</button><pre id="envCmd"># .env
+AI_CREDIT_API_KEY=ak_live_xxx
+AI_CREDIT_BASE_URL=https://api.billbridge.in/v1</pre></div>
+          <div class="code"><button class="copy" data-copy="envPyCmd">Copy</button><pre id="envPyCmd">import os
+from ai_credit_sdk.client import AICreditClient
+
+client = AICreditClient(
+    api_key=os.getenv("AI_CREDIT_API_KEY"),
+    base_url=os.getenv("AI_CREDIT_BASE_URL", "https://api.billbridge.in/v1"),
+)</pre></div>
+        </div>
       </div>
     </main>
   </div>
