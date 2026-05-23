@@ -1,3 +1,4 @@
 .env
 stripe_secrets.fish
 .env.example
+prometheus.yml
