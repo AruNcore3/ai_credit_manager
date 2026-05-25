@@ -40,9 +40,18 @@ def get_current_user(
 
 def require_admin(
     x_admin_token: str | None = Header(default=None, alias="X-Admin-Token"),
+    authorization: str | None = Header(default=None, alias="Authorization"),
 ) -> None:
     configured = os.getenv("ADMIN_TOKEN")
     if not configured:
         raise HTTPException(status_code=503, detail="admin controls are not configured")
-    if not x_admin_token or x_admin_token != configured:
+
+    bearer_token = None
+    if authorization:
+        scheme, _, token = authorization.partition(" ")
+        if scheme.lower() == "bearer" and token:
+            bearer_token = token.strip()
+
+    provided = x_admin_token or bearer_token
+    if not provided or provided != configured:
         raise HTTPException(status_code=403, detail="forbidden")

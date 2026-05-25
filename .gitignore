@@ -2,3 +2,4 @@
 stripe_secrets.fish
 .env.example
 prometheus.yml
+monitoring/prometheus.local.yml
