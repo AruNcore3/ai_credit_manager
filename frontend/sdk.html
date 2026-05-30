@@ -1,118 +1,17 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Billbridge SDK Guides</title>
-  <style>
-    :root { --bg:#f8f6ff; --panel:#ffffff; --line:#e5dbff; --text:#24133f; --muted:#6b5a96; --assistant:#f4efff; --user:#fbf9ff; --code:#2a1848; --codeText:#f3ecff; }
-    * { box-sizing: border-box; } body { margin:0; font-family:"Segoe UI",Arial,sans-serif; background:var(--bg); color:var(--text); }
-    .layout { max-width:1200px; margin:0 auto; min-height:100vh; display:grid; grid-template-columns:280px 1fr; gap:14px; padding:14px; }
-    .sidebar,.main { background:var(--panel); border:1px solid var(--line); border-radius:12px; animation:fadeIn .35s ease both; }
-    .sidebar { padding:14px; } .brand{font-size:15px;font-weight:700;margin-bottom:10px;} .hint{font-size:12px;color:var(--muted);margin-bottom:12px;}
-    .menu a{display:block;text-decoration:none;color:#3b2d63;font-size:14px;padding:9px 10px;border-radius:8px;margin-bottom:6px;border:1px solid transparent;transition:all .2s ease;}
-    .menu a.active{background:#eee5ff;color:#6a3dd9;border-color:#cfbbff;font-weight:600;} .menu a:hover{background:#f6f1ff;transform:translateX(2px);}
-    .github-link{margin-top:12px;display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:#6a3dd9;font-size:13px;font-weight:600;padding:8px 10px;border:1px solid #cfbbff;border-radius:9px;background:#f3ecff;}
-    .github-link svg{width:16px;height:16px;fill:currentColor;}
-    .main{padding:16px;} .chat{max-width:860px;margin:0 auto;}
-    .msg{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;animation:floatUp .35s ease both;} .assistant{background:var(--assistant);} .user{background:var(--user);}
-    .role{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#7a5ec2;margin-bottom:6px;}
-    h1{margin:0 0 8px;font-size:28px;} p{margin:0;color:#3f2f69;line-height:1.5;}
-    .code{margin-top:8px;background:var(--code);color:var(--codeText);border:1px solid #30363d;border-radius:8px;padding:12px;position:relative;}
-    pre{margin:0;white-space:pre-wrap;font-size:13px;} .copy{position:absolute;top:8px;right:8px;font-size:12px;padding:4px 8px;border-radius:7px;border:1px solid #cfbbff;background:#f3ecff;color:#6a3dd9;cursor:pointer;transition:all .2s ease;}
-    .copy:hover{transform:translateY(-1px);background:#eadfff;}
-    .steps{margin-top:8px;padding-left:18px;color:#3f2f69;}
-    .steps li{margin-bottom:6px;}
-    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-    @keyframes floatUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-    @media (max-width:940px){.layout{grid-template-columns:1fr;}}
-  </style>
-</head>
-<body>
-  <div class="layout">
-    <aside class="sidebar">
-      <div class="brand">Billbridge Assistant Docs</div>
-      <div class="hint">SDK install and usage</div>
-      <nav class="menu">
-        <a href="/developer">Home</a>
-        <a href="/developer/install">Install Guide</a>
-        <a href="/developer/quickstart">Quickstart</a>
-        <a href="/developer/flow">Flow Tutorial</a>
-        <a href="/developer/auth">Auth & API Keys</a>
-        <a class="active" href="/developer/sdk">SDK</a>
-      </nav>
-      <a class="github-link" href="https://github.com/AruNcore3/ai_credit_manager" target="_blank" rel="noreferrer"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.01.08-2.1 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.09.16 1.9.08 2.1.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg><span>GitHub Repo</span></a>
-    </aside>
-    <main class="main">
-      <div class="chat">
-        <div class="msg assistant"><div class="role">Assistant</div><h1>SDK Guides</h1><p>Install and integrate with Python and Node clients.</p></div>
-        <div class="msg user"><div class="role">You</div><p>Show me the exact SDK commands and example usage.</p></div>
-        <div class="msg assistant"><div class="role">Assistant</div><div class="code"><button class="copy" data-copy="sdkCmd">Copy</button><pre id="sdkCmd"></pre></div></div>
-        <div class="msg user"><div class="role">You</div><p>How do I download and integrate Billbridge into my SaaS backend?</p></div>
-        <div class="msg assistant">
-          <div class="role">Assistant</div>
-          <p><strong>Hosted integration tutorial</strong></p>
-          <ol class="steps">
-            <li>Create a Billbridge tenant using <code>POST /v1/onboarding/signup</code> and store returned <code>api_key</code>.</li>
-            <li>Add env vars in your backend service: <code>AI_CREDIT_API_KEY</code> and <code>AI_CREDIT_BASE_URL=https://api.billbridge.in/v1</code>.</li>
-            <li>Call Billbridge from your product APIs: check balance before usage-heavy actions, then record usage after completion.</li>
-            <li>Create top-up intents when users run low and confirm credits via Stripe webhooks.</li>
-          </ol>
-          <div class="code">
-            <pre># Node (Express) example
-import { AICreditClient } from "billbridge-ai-credit-sdk";
-const billbridge = new AICreditClient({
-  apiKey: process.env.AI_CREDIT_API_KEY,
-  baseUrl: "https://api.billbridge.in/v1",
-});
+<!doctype html><html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>Billbridge SDK</title><style>:root{--bg:#fff;--fg:#0f172a;--muted:#717182;--line:rgba(0,0,0,.1);--soft:#f8f8fb}*{box-sizing:border-box}body{margin:0;font-family:"Inter","Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--fg)}a{text-decoration:none;color:inherit}.container{width:min(1120px,92vw);margin:0 auto}.topbar{position:fixed;top:0;left:0;right:0;z-index:30;border-bottom:1px solid var(--line);background:rgba(255,255,255,.86);backdrop-filter:blur(10px)}.topbar-inner{min-height:74px;display:flex;align-items:center;justify-content:space-between}.brand{display:inline-flex;align-items:center;gap:10px;font-weight:650}.brand img{height:34px}.nav{display:flex;gap:22px;font-size:14px;color:#0f172acc}.hero{padding:122px 0 24px;background:linear-gradient(to bottom,#f5f5f7 0%,#fff 65%)}h1{margin:0 0 10px;font-size:44px}.sub{margin:0;color:var(--muted)}.section{padding:18px 0 60px}.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px}.code{margin-top:10px;background:#111827;color:#e5e7eb;border-radius:12px;position:relative;border:1px solid #1f2937}pre{margin:0;padding:14px;overflow:auto;font-size:13px;line-height:1.6;white-space:pre-wrap;font-family:ui-monospace,Consolas,monospace}.copy{position:absolute;top:8px;right:8px;border-radius:8px;border:1px solid #374151;background:#111827;color:#e5e7eb;padding:4px 8px;font-size:12px;cursor:pointer}footer{border-top:1px solid var(--line);background:var(--soft)}.foot{padding:22px 0;color:var(--muted);font-size:13px;text-align:center}@media (max-width:900px){.nav{display:none}}</style></head><body><header class="topbar"><div class="container topbar-inner"><a class="brand" href="/developer"><img src="/developer-assets/assets/billbridge-logo.png" alt="Billbridge logo" /><span>Billbridge</span></a><nav class="nav"><a href="/developer">Home</a><a href="/developer/install">Install</a><a href="/developer/quickstart">Quickstart</a><a href="/developer/flow">Flow</a><a href="/developer/auth">Auth</a><a href="/developer/sdk">SDK</a></nav><a href="https://github.com/AruNcore3/ai_credit_manager" target="_blank" rel="noreferrer">GitHub</a></div></header><section class="hero"><div class="container"><h1>SDK Guides</h1><p class="sub">Use Billbridge from Python and Node with clean client-style methods.</p></div></section><section class="section"><div class="container"><article class="card"><h2>Install and first call</h2><div class="code"><button class="copy" data-copy="sdkCmd">Copy</button><pre id="sdkCmd"></pre></div></article><article class="card"><h2>Python backend example</h2><div class="code"><pre>from ai_credit_sdk.client import AICreditClient
 
-app.post("/run-model", async (req, res) => {
-  const balance = await billbridge.credits.balance();
-  if (balance.balance &lt; 10) return res.status(402).json({ error: "low credits" });
-
-  // run your LLM call here...
-  const result = { ok: true };
-
-  await billbridge.usage.record({
-    event_id: `evt_${Date.now()}`,
-    model: "gpt-4.1",
-    input_token: 1200,
-    output_token: 400,
-  });
-  res.json(result);
-});</pre>
-          </div>
-          <div class="code">
-            <pre># Python (FastAPI) example
-from fastapi import FastAPI, HTTPException
-from ai_credit_sdk.client import AICreditClient
-import time
-
-app = FastAPI()
-billbridge = AICreditClient(
+client = AICreditClient(
     api_key="YOUR_API_KEY",
     base_url="https://api.billbridge.in/v1",
 )
 
-@app.post("/run-model")
-def run_model():
-    bal = billbridge.credits.balance()
-    if bal["balance"] &lt; 10:
-        raise HTTPException(status_code=402, detail="low credits")
+bal = client.credits.balance()
+print(bal)</pre></div></article><article class="card"><h2>Node backend example</h2><div class="code"><pre>import { AICreditClient } from "billbridge-ai-credit-sdk";
 
-    # run your LLM call here...
-    billbridge.usage.record({
-        "event_id": f"evt_{int(time.time())}",
-        "model": "gpt-4.1",
-        "input_token": 1000,
-        "output_token": 500,
-    })
-    return {"ok": True}</pre>
-          </div>
-        </div>
-      </div>
-    </main>
-  </div>
-  <script src="/developer-assets/app.js"></script>
-</body>
-</html>
+const client = new AICreditClient({
+  apiKey: process.env.AI_CREDIT_API_KEY,
+  baseUrl: "https://api.billbridge.in/v1",
+});
+
+const bal = await client.credits.balance();
+console.log(bal);</pre></div></article></div></section><footer><div class="container foot">© <span id="year"></span> Billbridge</div></footer><script src="/developer-assets/app.js"></script><script>document.getElementById("year").textContent=new Date().getFullYear();</script></body></html>
