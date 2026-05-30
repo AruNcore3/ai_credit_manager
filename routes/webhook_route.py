@@ -6,11 +6,17 @@ from sqlalchemy.orm import Session
 from app.config import STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET
 from app.database import get_db
 from app.observability import observability
-from services.credit_service import apply_paid_topup_once
+from services.webhook_processor_service import process_stripe_event
+from services.webhook_reliability_service import (
+    mark_failed,
+    mark_processed,
+    upsert_webhook_event,
+)
 
 stripe.api_key = STRIPE_SECRET_KEY
 router = APIRouter(prefix="/webhooks", tags=["webhooks"])
 logger = logging.getLogger(__name__)
+
 
 @router.post("/stripe")
 async def stripe_webhook(
@@ -32,45 +38,34 @@ async def stripe_webhook(
             logger.error("alert_triggered type=webhook_signature_failures threshold_window=60s")
         raise HTTPException(status_code=400, detail="invalid webhook signature")
 
-    event_type = event["type"]
-    logger.info("stripe_webhook_received event_type=%s", event_type)
-
-    if event_type == "payment_intent.succeeded":
-        pi = event["data"]["object"]
-        payment_intent_id = pi["id"]
-        try:
-            raw_metadata = pi["metadata"]
-            metadata = dict(raw_metadata) if raw_metadata else {}
-        except Exception:
-            metadata = {}
-        logger.info("stripe_webhook_metadata metadata=%s", metadata)
-
-        attempt_id = metadata.get("topup_attempt_id")
-        if attempt_id is None:
-            logger.warning("missing_attempt_id_in_metadata payment_intent_id=%s", payment_intent_id)
-            applied = apply_paid_topup_once(db, payment_intent_id=payment_intent_id)
-        else:
-            try:
-                parsed_attempt_id = int(attempt_id)
-            except (TypeError, ValueError):
-                logger.warning(
-                    "invalid_attempt_id_in_metadata topup_attempt_id=%s payment_intent_id=%s",
-                    attempt_id,
-                    payment_intent_id,
-                )
-                applied = False
-            else:
-                applied = apply_paid_topup_once(
-                    db,
-                    attempt_id=parsed_attempt_id,
-                    payment_intent_id=payment_intent_id,
-                )
-        logger.info(
-            "stripe_payment_intent_succeeded payment_intent_id=%s credits_applied=%s",
-            payment_intent_id,
-            applied,
+    event_id = event.get("id", "unknown")
+    event_type = event.get("type", "unknown")
+    upsert_webhook_event(
+        db,
+        provider="stripe",
+        event_id=event_id,
+        event_type=event_type,
+        payload=event,
+    )
+    db.commit()
+    try:
+        process_stripe_event(db, event)
+        mark_processed(db, event_id)
+        db.commit()
+    except Exception as exc:
+        db.rollback()
+        row = mark_failed(db, event_id=event_id, error_message=str(exc))
+        db.commit()
+        is_alert = observability.increment_event("webhook_processing_error")
+        logger.exception(
+            "webhook_processing_error event_id=%s event_type=%s attempts=%s error=%s",
+            event_id,
+            event_type,
+            row.attempts if row else None,
+            str(exc),
         )
-    else:
-        logger.info("stripe_webhook_ignored event_type=%s", event_type)
+        if is_alert:
+            logger.error("alert_triggered type=webhook_processing_errors threshold_window=60s")
+        raise HTTPException(status_code=500, detail="webhook processing failed")
 
     return {"received": True}

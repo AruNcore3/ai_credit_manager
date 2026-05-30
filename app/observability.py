@@ -19,6 +19,8 @@ class Observability:
             "stripe_webhook_invalid_signature": int(os.getenv("ALERT_WEBHOOK_SIG_FAIL_PER_MINUTE", "5")),
             "topup_intent_stripe_error": int(os.getenv("ALERT_STRIPE_FAILURES_PER_MINUTE", "5")),
             "reconciliation_attempt_error": int(os.getenv("ALERT_RECONCILIATION_ERRORS_PER_MINUTE", "3")),
+            "webhook_processing_error": int(os.getenv("ALERT_WEBHOOK_PROCESSING_ERRORS_PER_MINUTE", "3")),
+            "reconciliation_run_failed": int(os.getenv("ALERT_RECONCILIATION_RUN_FAILURES_PER_MINUTE", "2")),
         }
 
     def observe_request(self, *, method: str, path: str, status: int, latency_ms: float) -> None:

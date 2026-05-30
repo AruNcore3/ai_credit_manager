@@ -12,6 +12,7 @@ from models.ledger import Ledger
 from models.topup_attempt import TopUpAttempt
 from models.users import User
 from models.wallet import Wallet
+from models.webhook_delivery import WebhookDelivery
 
 __all__ = [
     "Account",
@@ -21,5 +22,6 @@ __all__ = [
     "TopUpAttempt",
     "User",
     "Wallet",
+    "WebhookDelivery",
 ]
 

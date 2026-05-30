@@ -3,195 +3,537 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Billbridge AI Docs</title>
+  <title>Billbridge API Platform</title>
   <style>
     :root {
-      --bg: #f8f6ff;
+      --bg: #ffffff;
+      --fg: #0f172a;
+      --muted: #717182;
       --panel: #ffffff;
-      --line: #e5dbff;
-      --text: #24133f;
-      --muted: #6b5a96;
-      --accent: #9b5cff;
-      --assistant: #f4efff;
-      --user: #fbf9ff;
+      --soft: #f3f4f6;
+      --line: rgba(0, 0, 0, 0.1);
+      --primary: #0f172a;
+      --primary-ink: #ffffff;
+      --ok: #22c55e;
+      --warn: #fbbf24;
+      --bad: #ef4444;
+      --radius: 16px;
     }
     * { box-sizing: border-box; }
-    body { margin: 0; font-family: "Segoe UI", Arial, sans-serif; background: var(--bg); color: var(--text); }
-    .layout { max-width: 1200px; margin: 0 auto; min-height: 100vh; display: grid; grid-template-columns: 280px 1fr; gap: 14px; padding: 14px; }
-    .sidebar, .main {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      animation: fadeIn .4s ease both;
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.5;
     }
-    .sidebar { padding: 14px; }
-    .brand { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
-    .hint { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
-    .menu a {
-      display: block; text-decoration: none; color: #3b2d63; font-size: 14px;
-      padding: 9px 10px; border-radius: 8px; margin-bottom: 6px; border: 1px solid transparent;
-      transition: all .2s ease;
+    a { color: inherit; text-decoration: none; }
+    .container { width: min(1120px, 92vw); margin: 0 auto; }
+
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 30;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(10px);
     }
-    .menu a.active { background: #eee5ff; color: #6a3dd9; border-color: #cfbbff; font-weight: 600; }
-    .menu a:hover { background: #f6f1ff; transform: translateX(2px); }
-    .menu .small { font-size: 12px; color: var(--muted); padding-left: 10px; margin: 10px 0 6px; }
-    .github-link {
-      margin-top: 12px;
+    .topbar-inner {
+      min-height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 650;
+      letter-spacing: -0.01em;
+    }
+    .brand-logo {
+      height: 34px;
+      width: auto;
+      display: block;
+      object-fit: contain;
+    }
+    .brand-logo-footer {
+      height: 38px;
+      width: auto;
+      display: block;
+      object-fit: contain;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      color: #0f172acc;
+      font-size: 14px;
+    }
+    .nav-links a:hover { color: var(--fg); }
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn {
+      border: 1px solid transparent;
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: transform .2s ease, opacity .2s ease, background .2s ease;
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      text-decoration: none;
-      color: #6a3dd9;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-ghost { background: transparent; color: var(--fg); border-color: var(--line); }
+    .btn-primary { background: var(--primary); color: var(--primary-ink); }
+
+    .hero {
+      padding-top: 132px;
+      padding-bottom: 72px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, #f5f5f7 0%, #fff 60%);
+      z-index: -2;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 50%;
+      width: 180%;
+      height: 100%;
+      margin-right: 40px;
+      transform-origin: bottom left;
+      transform: skewX(-28deg);
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 25px 40px rgba(124, 58, 237, 0.06);
+      z-index: -1;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.02fr 0.98fr;
+      gap: 40px;
+      align-items: center;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #f1f2f5;
+      color: #111827;
+      border-radius: 999px;
+      padding: 8px 14px;
       font-size: 13px;
-      font-weight: 600;
-      padding: 8px 10px;
-      border: 1px solid #cfbbff;
-      border-radius: 9px;
-      background: #f3ecff;
+      margin-bottom: 22px;
+      animation: fadeUp .55s ease both;
     }
-    .github-link svg { width: 16px; height: 16px; fill: currentColor; }
-    .main { padding: 16px; }
-    .chat { max-width: 860px; margin: 0 auto; }
-    .msg {
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 99px;
+      background: #7c3aed;
+      box-shadow: 0 0 0 5px rgba(124, 58, 237, 0.15);
+    }
+    h1 {
+      margin: 0 0 16px;
+      font-size: clamp(40px, 6vw, 76px);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      animation: fadeUp .6s ease both;
+    }
+    .grad {
+      background: linear-gradient(90deg, #0f172a 0%, #7c3aed 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .sub {
+      margin: 0 0 26px;
+      color: var(--muted);
+      font-size: 18px;
+      max-width: 620px;
+      animation: fadeUp .65s ease both;
+    }
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      animation: fadeUp .7s ease both;
+    }
+    .inline-link {
+      font-size: 14px;
+      color: #1f2937;
+      font-weight: 500;
+    }
+    .inline-link:hover { text-decoration: underline; }
+
+    .code-card {
+      background: var(--panel);
       border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 30px 60px rgba(2, 6, 23, 0.08);
+      animation: floatIn .65s ease both;
+    }
+    .code-head {
+      border-bottom: 1px solid var(--line);
+      padding: 10px 14px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .bulb {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      display: inline-block;
+    }
+    .b1 { background: var(--bad); }
+    .b2 { background: var(--warn); }
+    .b3 { background: var(--ok); }
+    pre {
+      margin: 0;
+      padding: 16px;
+      overflow: auto;
+      font-size: 13px;
+      line-height: 1.65;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      color: #0f172a;
+      background: #ffffff;
+    }
+
+    .section {
+      padding: 84px 0;
+    }
+    .section.soft { background: #f8f8fb; }
+    .section-head {
+      max-width: 760px;
+      margin: 0 auto 48px;
+      text-align: center;
+    }
+    h2 {
+      margin: 0 0 14px;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+    }
+    .section-head p { margin: 0; font-size: 18px; color: var(--muted); }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 28px;
+    }
+    .feature {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 22px;
+      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    }
+    .feature:hover {
+      transform: translateY(-4px);
+      border-color: #7c3aed55;
+      box-shadow: 0 18px 30px rgba(2, 6, 23, 0.06);
+    }
+    .ic {
+      width: 40px;
+      height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       border-radius: 12px;
-      padding: 12px 14px;
+      background: #f3e8ff;
+      color: #6d28d9;
       margin-bottom: 10px;
-      animation: floatUp .35s ease both;
+      font-size: 18px;
     }
-    .assistant { background: var(--assistant); }
-    .user { background: var(--user); }
-    .role { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #7a5ec2; margin-bottom: 6px; }
-    h1 { margin: 0 0 8px; font-size: 30px; letter-spacing: -.01em; }
-    p { margin: 0; line-height: 1.5; color: #3f2f69; }
-    .prompts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-    .prompt {
-      display: block; text-decoration: none; color: #35285b; background: #ffffff;
-      border: 1px solid var(--line); border-radius: 10px; padding: 12px;
+    .feature h3 { margin: 0 0 8px; font-size: 18px; }
+    .feature p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    .docs-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
     }
-    .prompt.link {
-      transition: transform .2s ease, border-color .2s ease;
-      cursor: pointer;
+    .doc-card {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+      padding: 22px;
+      transition: all .2s ease;
     }
-    .prompt.link:hover { transform: translateY(-2px); border-color: #9b5cff; }
-    .prompt strong { display: block; margin-bottom: 4px; font-size: 14px; }
-    .prompt span { font-size: 12px; color: var(--muted); }
-    .refs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-    .refs a {
-      text-decoration: none; font-size: 12px; font-weight: 600; color: #6a3dd9;
-      border: 1px solid #cfbbff; background: #f3ecff; border-radius: 999px; padding: 6px 10px;
+    .doc-card:hover {
+      border-color: #7c3aed66;
+      box-shadow: 0 16px 30px rgba(2, 6, 23, 0.06);
+      transform: translateY(-3px);
     }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes floatUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-    @media (max-width: 940px) {
-      .layout { grid-template-columns: 1fr; }
-      .prompts { grid-template-columns: 1fr; }
+    .doc-title { margin: 0 0 8px; font-size: 18px; }
+    .doc-text { margin: 0 0 10px; color: var(--muted); font-size: 14px; }
+    .doc-link { color: #6d28d9; font-size: 14px; font-weight: 600; }
+
+    .cta {
+      margin-top: 28px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 34px 22px;
+      text-align: center;
+      background: linear-gradient(145deg, #ede9fe 0%, #f8fafc 100%);
+    }
+    .cta p { margin: 10px auto 0; max-width: 680px; color: var(--muted); }
+
+    .pricing {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+      align-items: stretch;
+    }
+    .plan {
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 24px;
+      background: #fff;
+    }
+    .plan.pro {
+      border-color: #7c3aed55;
+      background: linear-gradient(180deg, #faf5ff 0%, #fff 30%);
+      transform: scale(1.02);
+      box-shadow: 0 18px 30px rgba(124, 58, 237, 0.08);
+    }
+    .plan h3 { margin: 0 0 8px; font-size: 20px; }
+    .plan .desc { margin: 0 0 12px; color: var(--muted); font-size: 14px; }
+    .price { margin: 0; font-size: 38px; letter-spacing: -0.02em; }
+    .pm { color: var(--muted); font-size: 14px; }
+    .plan .btn { margin-top: 14px; justify-content: center; width: 100%; }
+    .plan ul { margin: 16px 0 0; padding-left: 18px; color: var(--muted); font-size: 14px; }
+    .plan li { margin-bottom: 8px; }
+
+    footer {
+      margin-top: 22px;
+      border-top: 1px solid var(--line);
+      background: #f8f8fb;
+    }
+    .foot {
+      padding: 50px 0 20px;
+      display: grid;
+      grid-template-columns: 1.3fr 1fr 1fr 1fr;
+      gap: 18px;
+    }
+    .foot h4 { margin: 0 0 10px; font-size: 14px; }
+    .foot p, .foot a { color: var(--muted); font-size: 14px; margin: 0; display: block; margin-bottom: 8px; }
+    .copy {
+      border-top: 1px solid var(--line);
+      padding: 12px 0 20px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes floatIn {
+      from { opacity: 0; transform: translateY(20px) scale(.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @media (max-width: 980px) {
+      .nav-links { display: none; }
+      .hero-grid { grid-template-columns: 1fr; }
+      .features { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .docs-grid { grid-template-columns: 1fr; }
+      .pricing { grid-template-columns: 1fr; }
+      .plan.pro { transform: none; }
+      .foot { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 640px) {
+      .actions .btn-ghost { display: none; }
+      .features { grid-template-columns: 1fr; }
+      .foot { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <div class="layout">
-    <aside class="sidebar">
-      <div class="brand">Billbridge Assistant Docs</div>
-      <div class="hint">LLM-style guide for API onboarding</div>
-      <nav class="menu">
-        <a class="active" href="/developer">Home</a>
-        <a href="/developer/install">Install Guide</a>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="/developer">
+        <img class="brand-logo" src="/developer-assets/assets/billbridge-logo.png" alt="Billbridge logo" />
+        <span>Billbridge API Platform</span>
+      </a>
+      <nav class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#documentation">Documentation</a>
+        <a href="#pricing">Pricing</a>
+        <a href="/reference" target="_blank" rel="noreferrer">API Reference</a>
+      </nav>
+      <div class="actions">
+        <a class="btn btn-ghost" href="https://github.com/AruNcore3/ai_credit_manager" target="_blank" rel="noreferrer">GitHub</a>
+        <a class="btn btn-primary" href="/developer/quickstart">Get Started</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container hero-grid">
+      <div>
+        <div class="badge"><span class="dot"></span>New: Billing reliability stack shipping now</div>
+        <h1>Build usage billing with a <span class="grad">production-ready API</span></h1>
+        <p class="sub">
+          Billbridge gives AI SaaS teams wallets, usage metering, top-ups, webhooks, reconciliation, and key lifecycle APIs
+          so you can ship revenue-critical billing flows faster.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="/developer/quickstart">Get started for free</a>
+          <a class="inline-link" href="/developer/install">Install Guide →</a>
+        </div>
+      </div>
+      <div class="code-card">
+        <div class="code-head">
+          <span class="bulb b1"></span><span class="bulb b2"></span><span class="bulb b3"></span>
+        </div>
+        <pre># Python SDK
+pip install billbridge-ai-credit-sdk
+
+from ai_credit_sdk.client import AICreditClient
+client = AICreditClient(
+  api_key="YOUR_API_KEY",
+  base_url="https://api.billbridge.in/v1"
+)
+
+balance = client.credits.balance()
+print(balance)</pre>
+      </div>
+    </div>
+  </section>
+
+  <section id="features" class="section soft">
+    <div class="container">
+      <div class="section-head">
+        <h2>Everything needed for AI billing</h2>
+        <p>Core primitives for credits, usage, payments, and reliability built into one integration surface.</p>
+      </div>
+      <div class="features">
+        <article class="feature"><div class="ic">⚡</div><h3>Fast Integration</h3><p>Hosted API with clean `/v1` routes, SDKs, and quickstart paths.</p></article>
+        <article class="feature"><div class="ic">🔐</div><h3>Secure by Default</h3><p>API-key auth, strict CORS, tenant-aware rate limit identity, and audit trails.</p></article>
+        <article class="feature"><div class="ic">🧾</div><h3>Credits & Ledger</h3><p>Wallet balances, immutable ledger entries, and usage-linked deductions.</p></article>
+        <article class="feature"><div class="ic">💳</div><h3>Top-up Payments</h3><p>Create Stripe payment intents and apply credits idempotently on success.</p></article>
+        <article class="feature"><div class="ic">🪝</div><h3>Webhook Reliability</h3><p>Failure tracking, retry metadata, dead-letter state, and admin replay support.</p></article>
+        <article class="feature"><div class="ic">📈</div><h3>Observability</h3><p>Metrics, alert signals, reconciliation failure visibility, and dashboards-ready output.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section id="documentation" class="section">
+    <div class="container">
+      <div class="section-head">
+        <h2>Developer resources</h2>
+        <p>Everything your team needs to integrate, test, and operate Billbridge in production.</p>
+      </div>
+      <div class="docs-grid">
+        <a class="doc-card" href="/developer/install"><h3 class="doc-title">Install Guide</h3><p class="doc-text">Install SDK like any package and run your first request quickly.</p><span class="doc-link">Open guide →</span></a>
+        <a class="doc-card" href="/developer/quickstart"><h3 class="doc-title">Quickstart</h3><p class="doc-text">Signup, get API key, check balance, and make first usage calls.</p><span class="doc-link">Open quickstart →</span></a>
+        <a class="doc-card" href="/developer/flow"><h3 class="doc-title">Flow Tutorial</h3><p class="doc-text">Signup → top-up → usage → webhook confirm with examples.</p><span class="doc-link">See flow →</span></a>
+        <a class="doc-card" href="/docs" target="_blank" rel="noreferrer"><h3 class="doc-title">Swagger / OpenAPI</h3><p class="doc-text">Explore endpoint schemas, payloads, and response models.</p><span class="doc-link">Open reference →</span></a>
+      </div>
+      <div class="cta">
+        <h2 style="margin:0; font-size:34px;">Ready to launch billing infrastructure?</h2>
+        <p>Use Billbridge as the billing backbone for your AI product and focus on shipping customer value.</p>
+        <div style="margin-top:16px;">
+          <a class="btn btn-primary" href="/developer/quickstart">Create Free Account</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pricing" class="section soft">
+    <div class="container">
+      <div class="section-head">
+        <h2>Pricing that scales with your product</h2>
+        <p>Simple plans from prototype to production. Contact for custom enterprise support.</p>
+      </div>
+      <div class="pricing">
+        <article class="plan">
+          <h3>Free</h3>
+          <p class="desc">Great for local testing and early-stage prototypes.</p>
+          <p class="price">$0 <span class="pm">/month</span></p>
+          <a class="btn btn-ghost" href="/developer/quickstart">Get started</a>
+          <ul>
+            <li>Core API access</li>
+            <li>Community support</li>
+            <li>Basic request limits</li>
+          </ul>
+        </article>
+        <article class="plan pro">
+          <h3>Pro</h3>
+          <p class="desc">For production apps with active usage billing.</p>
+          <p class="price">$49 <span class="pm">/month</span></p>
+          <a class="btn btn-primary" href="/developer/quickstart">Upgrade to Pro</a>
+          <ul>
+            <li>Higher quotas</li>
+            <li>Priority support</li>
+            <li>Advanced observability hooks</li>
+            <li>Webhook replay operations</li>
+          </ul>
+        </article>
+        <article class="plan">
+          <h3>Enterprise</h3>
+          <p class="desc">Custom SLAs, controls, and support for scale teams.</p>
+          <p class="price">Custom</p>
+          <a class="btn btn-ghost" href="mailto:support@billbridge.in">Contact sales</a>
+          <ul>
+            <li>Custom limits & controls</li>
+            <li>Dedicated onboarding</li>
+            <li>Contract support terms</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container foot">
+      <div>
+        <div class="brand"><img class="brand-logo-footer" src="/developer-assets/assets/billbridge-logo.png" alt="Billbridge logo" /><span>Billbridge</span></div>
+        <p style="margin-top:10px;">Mid-cycle billing infrastructure for AI SaaS products.</p>
+      </div>
+      <div>
+        <h4>Product</h4>
         <a href="/developer/quickstart">Quickstart</a>
-        <a href="/developer/flow">Flow Tutorial</a>
         <a href="/developer/auth">Auth & API Keys</a>
         <a href="/developer/sdk">SDK</a>
-        <div class="small">Reference</div>
+      </div>
+      <div>
+        <h4>Reference</h4>
         <a href="/docs" target="_blank" rel="noreferrer">Swagger UI</a>
         <a href="/reference" target="_blank" rel="noreferrer">ReDoc</a>
         <a href="/openapi.json" target="_blank" rel="noreferrer">OpenAPI JSON</a>
-      </nav>
-      <a class="github-link" href="https://github.com/AruNcore3/ai_credit_manager" target="_blank" rel="noreferrer">
-        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.01.08-2.1 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.09.16 1.9.08 2.1.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
-        <span>GitHub Repo</span>
-      </a>
-    </aside>
-    <main class="main">
-      <div class="chat">
-        <div class="msg assistant">
-          <div class="role">Assistant</div>
-          <h1>Welcome to Billbridge Developer Portal</h1>
-          <p>
-            Billbridge is mid-cycle billing infrastructure for AI SaaS products.
-            It helps you integrate credit wallets, usage metering, top-up payments,
-            ledger tracking, webhook handling, and API key management through one API.
-          </p>
-        </div>
-        <div class="msg user">
-          <div class="role">You</div>
-          <p>What problem does Billbridge solve for my product?</p>
-        </div>
-        <div class="msg assistant">
-          <div class="role">Assistant</div>
-          <p>
-            Instead of building payment tracking, idempotency, credit deduction logic,
-            webhook reconciliation, and API key lifecycle from scratch, Billbridge gives
-            you production-ready endpoints you can plug into your backend.
-          </p>
-          <div class="prompts">
-            <div class="prompt">
-              <strong>Best for AI tools</strong>
-              <span>LLM apps, API SaaS, and credit-based software products.</span>
-            </div>
-            <div class="prompt">
-              <strong>Usage-based billing</strong>
-              <span>Track input/output tokens and deduct credits per usage event.</span>
-            </div>
-          </div>
-        </div>
-        <div class="msg user">
-          <div class="role">You</div>
-          <p>How does the complete flow work?</p>
-        </div>
-        <div class="msg assistant">
-          <div class="role">Assistant</div>
-          <p><strong>How Billbridge Works</strong></p>
-          <div class="prompts">
-            <div class="prompt"><strong>1) Signup</strong><span>Customer signup creates account and API key.</span></div>
-            <div class="prompt"><strong>2) Top-up</strong><span>Create top-up payment intent before cycle end.</span></div>
-            <div class="prompt"><strong>3) Webhook confirm</strong><span>Stripe webhook marks payment success and applies credits.</span></div>
-            <div class="prompt"><strong>4) Usage deduction</strong><span>Record usage events and deduct wallet credits.</span></div>
-          </div>
-          <p style="margin-top:10px;"><strong>Core Features</strong></p>
-          <div class="prompts">
-            <a class="prompt link" href="/developer/quickstart">
-              <strong>Get API Key</strong>
-              <span>Signup, get key, run balance in minutes.</span>
-            </a>
-            <a class="prompt link" href="/developer/auth">
-              <strong>Auth Best Practices</strong>
-              <span>Header usage, rotation, and secure storage.</span>
-            </a>
-            <a class="prompt link" href="/developer/sdk">
-              <strong>Use SDKs</strong>
-              <span>Python and Node setup with grouped methods.</span>
-            </a>
-            <a class="prompt link" href="/developer/flow">
-              <strong>Full Billing Flow</strong>
-              <span>Signup, top-up, usage, webhook confirm with code.</span>
-            </a>
-            <a class="prompt link" href="/reference" target="_blank" rel="noreferrer">
-              <strong>Full API Reference</strong>
-              <span>Dive into endpoint-level details.</span>
-            </a>
-          </div>
-          <p style="margin-top:10px;">
-            Why Billbridge? Building billing infrastructure is painful. Billbridge gives
-            you developer-friendly APIs so you can focus on your SaaS product.
-          </p>
-          <div class="refs">
-            <a href="/docs" target="_blank" rel="noreferrer">Swagger</a>
-            <a href="/reference" target="_blank" rel="noreferrer">ReDoc</a>
-            <a href="/openapi.json" target="_blank" rel="noreferrer">OpenAPI</a>
-          </div>
-        </div>
       </div>
-    </main>
-  </div>
+      <div>
+        <h4>Company</h4>
+        <a href="https://github.com/AruNcore3/ai_credit_manager" target="_blank" rel="noreferrer">GitHub</a>
+        <a href="mailto:support@billbridge.in">Support</a>
+      </div>
+    </div>
+    <div class="container copy">© <span id="year"></span> Billbridge. All rights reserved.</div>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>

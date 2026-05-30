@@ -30,3 +30,26 @@ services:
         value: "true"
       - key: RATE_LIMIT_INCLUDE_PATH
         value: "false"
+      - key: WEBHOOK_MAX_ATTEMPTS
+        value: "5"
+      - key: WEBHOOK_RETRY_BASE_SECONDS
+        value: "60"
+
+  - type: cron
+    name: billbridge-reconciliation
+    runtime: python
+    plan: starter
+    buildCommand: "pip install -r requirements.txt"
+    schedule: "*/10 * * * *"
+    startCommand: "python scripts/run_reconciliation.py --older-than-minutes 5 --limit 200 --retries 3 --retry-delay-seconds 10"
+    envVars:
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: API_KEY_HASH_SECRET
+        sync: false
+      - key: REDIS_URL
+        sync: false

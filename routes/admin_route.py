@@ -1,3 +1,5 @@
+import json
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -5,12 +7,15 @@ from app.auth import require_admin
 from app.database import get_db
 from models.account import Account
 from models.api_key import ApiKey
+from models.webhook_delivery import WebhookDelivery
 from models.users import User
 from schemas.api_key_schema import ApiKeyItem
 from schemas.users_schema import AccountAdminItem, AccountAdminUpdateRequest, CreditAdjustmentRequest
 from services.api_key_service import revoke_api_key
 from services.audit_service import log_audit_event
 from services.tenant_service import admin_credit_adjustment
+from services.webhook_processor_service import process_stripe_event
+from services.webhook_reliability_service import mark_processed, mark_replayed
 
 router = APIRouter(prefix="/admin", tags=["admin"], dependencies=[Depends(require_admin)])
 
@@ -103,3 +108,67 @@ def revoke_any_key(key_id: int, db: Session = Depends(get_db)):
     )
     db.commit()
     return {"ok": True}
+
+
+@router.get("/webhooks/dlq")
+def list_webhook_dlq(status: str = "dead_letter", limit: int = 100, db: Session = Depends(get_db)):
+    rows = (
+        db.query(WebhookDelivery)
+        .filter(WebhookDelivery.status == status)
+        .order_by(WebhookDelivery.updated_at.desc())
+        .limit(limit)
+        .all()
+    )
+    return [
+        {
+            "id": row.id,
+            "provider": row.provider,
+            "event_id": row.event_id,
+            "event_type": row.event_type,
+            "status": row.status,
+            "attempts": row.attempts,
+            "max_attempts": row.max_attempts,
+            "next_retry_at": row.next_retry_at.isoformat() if row.next_retry_at else None,
+            "error_message": row.error_message,
+            "updated_at": row.updated_at.isoformat(),
+        }
+        for row in rows
+    ]
+
+
+@router.post("/webhooks/dlq/{delivery_id}/replay")
+def replay_webhook_delivery(delivery_id: int, db: Session = Depends(get_db)):
+    row = db.query(WebhookDelivery).filter(WebhookDelivery.id == delivery_id).one_or_none()
+    if row is None:
+        raise HTTPException(status_code=404, detail="webhook delivery not found")
+
+    try:
+        payload = json.loads(row.payload_json)
+    except Exception:
+        raise HTTPException(status_code=400, detail="webhook payload is invalid")
+
+    try:
+        process_stripe_event(db, payload)
+        mark_processed(db, row.event_id)
+        mark_replayed(db, event_id=row.event_id)
+        log_audit_event(
+            db,
+            actor_type="admin",
+            actor_id="admin_token",
+            action="admin.webhook.replay",
+            target_type="webhook_delivery",
+            target_id=str(row.id),
+            metadata={"event_id": row.event_id, "event_type": row.event_type},
+        )
+        db.commit()
+        return {"ok": True, "status": "replayed"}
+    except Exception as exc:
+        db.rollback()
+        row = db.query(WebhookDelivery).filter(WebhookDelivery.id == delivery_id).one_or_none()
+        if row is None:
+            raise HTTPException(status_code=404, detail="webhook delivery not found")
+        row.error_message = str(exc)[:2000]
+        row.status = "dead_letter"
+        db.add(row)
+        db.commit()
+        raise HTTPException(status_code=500, detail=f"replay failed: {str(exc)}")
